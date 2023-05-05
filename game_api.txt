@@ -83,6 +83,16 @@ in `bones.player_inventory_lists`.
 
 e.g. `table.insert(bones.player_inventory_lists, "backpack")`
 
+Additionally, callbacks can be registered to transfer items into the bones on death:
+
+`bones.public.register_transfer_inventory_to_bones_on_player_death(function(player){})`
+
+In the above functions this routine should be used to add itmes to the bones inventory:
+
+`bones.public.transfer_stack_to_bones(stack)`
+
+please note that the inventory these items were taken from still need to be disposed of.
+
 
 Creative API
 ------------
