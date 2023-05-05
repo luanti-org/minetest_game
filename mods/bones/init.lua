@@ -5,22 +5,12 @@
 
 -- Load support for MT game translation.
 local S = minetest.get_translator("bones")
--- bones are supposed to hold up to 4*8+6+4*3*8+4+3*3 item slots:
--- 4*8 for the main inventory
--- 6 for the 3d_armor
--- (at most) 4*3*8 for 4 backpack worth of items (unified inventory)
--- 4 more for the actual backpacks
--- 3*3 more for the crafting grid
--- that adds up to 147, so 150 slots would be sufficient
-local cols=15
-local rows=10
 
-bones = {
-	private={
-		dead_player_callbacks={}
-	},
-	public={}
-}
+local theoretical_max_slots = minetest.settings:get("bones_max_slots") or ( 15 * 10 )
+local dead_player_callbacks={}
+
+bones = {}
+
 
 local function is_owner(pos, name)
 	local owner = minetest.get_meta(pos):get_string("owner")
@@ -29,6 +19,7 @@ local function is_owner(pos, name)
 	end
 	return false
 end
+
 
 local function drop(pos, itemstack)
 	local obj = minetest.add_item(pos, itemstack:take_item(itemstack:get_count()))
@@ -41,6 +32,7 @@ local function drop(pos, itemstack)
 	end
 end
 
+
 local function drop_contents(pos)
 	local inv = minetest.get_meta(pos):get_inventory()
 
@@ -51,14 +43,32 @@ local function drop_contents(pos)
 	minetest.remove_node(pos)
 end
 
-local bones_formspec =
-	"size["..cols..","..(rows+5).."]" ..
-	"list[current_name;main;0,0.3;"..cols..","..rows..";]" ..
-	"list[current_player;main;"..((cols-8)/2)..","..rows..".85;8,1;]" ..
-	"list[current_player;main;"..((cols-8)/2)..","..(rows+2)..".08;8,3;8]" ..
-	"listring[current_name;main]" ..
-	"listring[current_player;main]" ..
-	default.get_hotbar_bg(0,4.85)
+
+local function get_bones_formspec_wh(cols,rows)
+	return
+		"size[" .. cols .. "," .. ( rows + 5 ) .. "]" ..
+		"list[current_name;main;0,0.3;" .. cols .. "," .. rows .. ";]" ..
+		"list[current_player;main;" .. ( ( cols - 8 ) / 2 ) .. "," .. rows .. ".85;8,1;]" ..
+		"list[current_player;main;".. ( ( cols - 8 ) / 2 ) .. "," .. ( rows + 2 ) .. ".08;8,3;8]" ..
+		"listring[current_name;main]" ..
+		"listring[current_player;main]" ..
+		default.get_hotbar_bg(0,4.85)
+end
+
+
+local function get_bones_formspec_for_size(numitems)
+	--the absolute minimum is 4*8
+	if numitems <= 4 * 8 then
+		return get_bones_formspec_wh(8, 4)
+	end
+	--if we're over 4*8, but below 4*15 we make it 4 rows and adjust the column count to make everything fit
+	if numitems <= 4 * 15 then
+		return get_bones_formspec_wh( math.floor ( ( numitems + 3 ) / 4 ), 4)
+	end
+	--if we're over 4*15 we'll make 15 columns and adjust the row count to make everything fit
+	return get_bones_formspec_wh(15, math.floor ( ( numitems + 14 ) / 15 ) )
+end
+
 
 local share_bones_time = tonumber(minetest.settings:get("share_bones_time")) or 1200
 local share_bones_time_early = tonumber(minetest.settings:get("share_bones_time_early")) or share_bones_time / 4
@@ -214,66 +224,58 @@ end
 local player_inventory_lists = { "main", "craft" }
 bones.player_inventory_lists = player_inventory_lists
 
-local function is_all_empty(player_inv)
-	for _, list_name in ipairs(player_inventory_lists) do
-		if not player_inv:is_empty(list_name) then
-			return false
-		end
-	end
-	return true
-end
-
 --functions registered this way won't becalled if bones_mode is keep
-function bones.public.register_transfer_inventory_to_bones_on_player_death(func)
-	bones.private.dead_player_callbacks[#(bones.private.dead_player_callbacks)]=func
+function bones.register_dead_player_inv_management(func)
+	table.insert(dead_player_callbacks, func)
 end
 
---drop or put into bones based on config and free slots in the bones
---supposed to be called from functions registered to bones.public.register_transfer_inventory_to_bones_on_player_death
-function bones.public.transfer_stack_to_bones(stk)
+local function transfer_stack_to_bones(stk,current_dead_player)
 	-- check if it's possible to place bones, if not find space near player
-	if ( ( bones.private.current_dead_player.bones_mode == "bones" ) and ( bones.private.current_dead_player.bones_pos == nil ) ) then
-		bones.private.current_dead_player.bones_pos = bones.private.current_dead_player.player_pos
+	if ( current_dead_player.bones_mode == "bones" ) and
+			( current_dead_player.bones_pos == nil ) then
+		current_dead_player.bones_pos = current_dead_player.player_pos
 		local air
-		if ( may_replace(bones.private.current_dead_player.bones_pos, bones.private.current_dead_player.player) ) then
-			air = bones.private.current_dead_player.bones_pos
+		if may_replace(current_dead_player.bones_pos, current_dead_player.player) then
+			air = current_dead_player.bones_pos
 		else
-			air = minetest.find_node_near(bones.private.current_dead_player.bones_pos, 1, {"air"})
+			air = minetest.find_node_near(current_dead_player.bones_pos, 1, {"air"})
 		end
 
-		if air and not minetest.is_protected(air, bones.private.current_dead_player.player_name) then
-			bones.private.current_dead_player.bones_pos = air
-			local param2 = minetest.dir_to_facedir(bones.private.current_dead_player.player:get_look_dir())
-			minetest.set_node(bones.private.current_dead_player.bones_pos, {name = "bones:bones", param2 = param2})
-			local meta = minetest.get_meta(bones.private.current_dead_player.bones_pos)
-			bones.private.current_dead_player.bones_inv = meta:get_inventory()
-			bones.private.current_dead_player.bones_inv:set_size("main", cols * rows)
+		if air and not minetest.is_protected(air, current_dead_player.player_name) then
+			current_dead_player.bones_pos = air
+			local param2 = minetest.dir_to_facedir(current_dead_player.player:get_look_dir())
+			minetest.set_node(current_dead_player.bones_pos, {name = "bones:bones", param2 = param2})
+			local meta = minetest.get_meta(current_dead_player.bones_pos)
+			current_dead_player.bones_inv = meta:get_inventory()
+			--make it so big that anything reasonable will for sure fit inside
+			current_dead_player.bones_inv:set_size("main", theoretical_max_slots)
 		else
-			bones.private.current_dead_player.bones_mode = "drop"
-			bones.private.current_dead_player.bones_pos = nil
+			current_dead_player.bones_mode = "drop"
+			current_dead_player.bones_pos = nil
 		end
 	end
 
-	if ( ( bones.private.current_dead_player.bones_mode == "bones" ) and ( bones.private.current_dead_player.bones_inv:room_for_item("main", stk) ) ) then
-		bones.private.current_dead_player.bones_inv:add_item("main", stk)
+	if ( current_dead_player.bones_mode == "bones" ) and
+			( current_dead_player.bones_inv:room_for_item("main", stk) ) then
+		current_dead_player.bones_inv:add_item("main", stk)
 	else
-		drop(bones.private.current_dead_player.player_pos, stk)
-		bones.private.current_dead_player.dropped=true
+		drop(current_dead_player.player_pos, stk)
+		current_dead_player.dropped=true
 	end
 end
 
-local function player_dies_transfer_inventory(player)
+local function player_dies_transfer_inventory(player,transfer_stack)
 	local player_inv = player:get_inventory()
 	for _, list_name in ipairs(player_inventory_lists) do
 		for i = 1, player_inv:get_size(list_name) do
 			local stack = player_inv:get_stack(list_name, i)
-			bones.public.transfer_stack_to_bones(stack)
+			transfer_stack(stack)
 		end
 		player_inv:set_list(list_name, {})
 	end
 end
 
-bones.public.register_transfer_inventory_to_bones_on_player_death(player_dies_transfer_inventory)
+bones.register_dead_player_inv_management(player_dies_transfer_inventory)
 
 minetest.register_on_dieplayer(function(player)
 	local pos = vector.round(player:get_pos())
@@ -282,7 +284,8 @@ minetest.register_on_dieplayer(function(player)
 		bones_mode = "bones"
 	end
 	local player_name = player:get_player_name()
-	bones.private.current_dead_player={player=player, player_name=player_name, bones_inv=nil, bones_pos=nil, bones_mode=bones_mode, player_pos=pos, dropped=false}
+	local current_dead_player={player=player, player_name=player_name, bones_inv=nil, bones_pos=nil,
+		bones_mode=bones_mode, player_pos=pos, dropped=false}
 
 	local bones_position_message = minetest.settings:get_bool("bones_position_message") == true
 	local pos_string = minetest.pos_to_string(pos)
@@ -297,58 +300,73 @@ minetest.register_on_dieplayer(function(player)
 		return
 	end
 
-	for i=0,#bones.private.dead_player_callbacks do
-		local fun=bones.private.dead_player_callbacks[i]
-		fun(player)
+	local callback=function(stk)
+		transfer_stack_to_bones(stk,current_dead_player)
 	end
 
-	local bones_conclusion=""
-	local public_conclusion=""
+	for i=1,#dead_player_callbacks do
+		local fun=dead_player_callbacks[i]
+		fun(player,callback)
+	end
 
-	if(not(bones.private.current_dead_player.bones_pos))then
-		drop(bones.private.current_dead_player.player_pos, ItemStack("bones:bones"))
-		if(not(bones.private.current_dead_player.dropped))then
+	local bones_conclusion
+
+	if not ( current_dead_player.bones_pos ) then
+		drop(current_dead_player.player_pos, ItemStack("bones:bones"))
+		if not ( current_dead_player.dropped ) then
 			bones_conclusion="No bones placed"
+			if bones_position_message then
+				minetest.chat_send_player(player_name, S("@1 died at @2.", player_name, pos_string))
+			end
 		else
 			bones_conclusion="Inventory dropped"
-			public_conclusion="dropped their inventory"
+			if bones_position_message then
+				minetest.chat_send_player(player_name, S("@1 died at @2, and dropped their inventory.", player_name, pos_string, public_conclusion))
+			end
 		end
 	else
-		if(not(bones.private.current_dead_player.dropped))then
+		if not ( current_dead_player.dropped ) then
 			bones_conclusion="Bones placed"
-			public_conclusion="bones were placed"
+			if bones_position_message then
+				minetest.chat_send_player(player_name, S("@1 died at @2, and bones were placed.", player_name, pos_string, public_conclusion))
+			end
 		else
 			bones_conclusion="Inventory partially dropped"
-			public_conclusion="partially dropped their inventory"
+			if bones_position_message then
+				minetest.chat_send_player(player_name, S("@1 died at @2, and partially dropped their inventory.", player_name, pos_string, public_conclusion))
+			end
 		end
 	end
 
 	minetest.log("action", player_name .. " dies at " .. pos_string ..
 		". " .. bones_conclusion)
 
-	if bones_position_message then
-		if(public_conclusion~="")then
-			public_conclusion=", and "..public_conclusion
+	local inv = current_dead_player.bones_inv
+	local inv_size = theoretical_max_slots
+	if inv then
+		for i = 1, theoretical_max_slots do
+			local stack = inv:get_stack("main", i)
+			if stack:get_count() == 0 then
+				inv_size = i - 1
+				break
+			end
 		end
-		minetest.chat_send_player(player_name, S("@1 died at @2@3.", player_name, pos_string, public_conclusion))
-	end
+		local meta = minetest.get_meta(current_dead_player.bones_pos)
+		meta:set_string("formspec", get_bones_formspec_for_size(inv_size))
+		meta:set_string("owner", player_name)
 
-	local meta = minetest.get_meta(bones.private.current_dead_player.bones_pos)
-	meta:set_string("formspec", bones_formspec)
-	meta:set_string("owner", player_name)
+		if share_bones_time ~= 0 then
+			meta:set_string("infotext", S("@1's fresh bones", player_name))
 
-	if share_bones_time ~= 0 then
-		meta:set_string("infotext", S("@1's fresh bones", player_name))
+			if share_bones_time_early == 0 or not minetest.is_protected(pos, player_name) then
+				meta:set_int("time", 0)
+			else
+				meta:set_int("time", (share_bones_time - share_bones_time_early))
+			end
 
-		if share_bones_time_early == 0 or not minetest.is_protected(pos, player_name) then
-			meta:set_int("time", 0)
+			minetest.get_node_timer(pos):start(10)
 		else
-			meta:set_int("time", (share_bones_time - share_bones_time_early))
+			meta:set_string("infotext", S("@1's bones", player_name))
 		end
-
-		minetest.get_node_timer(pos):start(10)
-	else
-		meta:set_string("infotext", S("@1's bones", player_name))
 	end
-	bones.private.current_dead_player=nil
 end)
