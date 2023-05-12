@@ -6,8 +6,10 @@
 -- Load support for MT game translation.
 local S = minetest.get_translator("bones")
 
-local theoretical_max_slots = minetest.settings:get("bones_max_slots") or 15 * 10
+local bones_max_slots = minetest.settings:get("bones_max_slots") or 15 * 10
 local dead_player_callbacks={}
+-- we're going to display no less than 4*8 slots, we'll also provide at least 4*8 slots in bones
+local min_inv_size = 4 * 8
 
 bones = {}
 
@@ -58,15 +60,15 @@ end
 
 local function get_bones_formspec_for_size(numitems)
 	--the absolute minimum is 4*8
-	if numitems <= 4 * 8 then
+	if numitems <= min_inv_size then
 		return get_bones_formspec_wh(8, 4)
 	end
 	--if we're over 4*8, but below 4*15 we make it 4 rows and adjust the column count to make everything fit
 	if numitems <= 4 * 15 then
-		return get_bones_formspec_wh(math.floor((numitems + 3) / 4), 4)
+		return get_bones_formspec_wh(math.ceil(numitems / 4), 4)
 	end
 	--if we're over 4*15 we'll make 15 columns and adjust the row count to make everything fit
-	return get_bones_formspec_wh(15, math.floor ((numitems + 14) / 15))
+	return get_bones_formspec_wh(15, math.ceil(numitems / 15))
 end
 
 
@@ -288,7 +290,7 @@ minetest.register_on_dieplayer(function(player)
 					bones_meta = minetest.get_meta(bones_pos)
 					bones_inv = bones_meta:get_inventory()
 					--make it so big that anything reasonable will for sure fit inside
-					bones_inv:set_size("main", theoretical_max_slots)
+					bones_inv:set_size("main", bones_max_slots)
 				else
 					bones_mode = "drop"
 					bones_pos = nil
@@ -304,45 +306,46 @@ minetest.register_on_dieplayer(function(player)
 		end
 	end
 
-	local bones_conclusion
-	local public_conclusion
+	local log_message
+	local chat_message
 
-	if not bones_pos then
-		drop(player_pos, ItemStack("bones:bones"))
-		if not dropped then
-			bones_conclusion = "No bones placed"
-			public_conclusion = S("@1 died at @2.", player_name, pos_string)
+	if bones_pos then
+		if dropped then
+			log_message = "Inventory partially dropped"
+			chat_message = "@1 died at @2, and partially dropped their inventory."
 		else
-			bones_conclusion = "Inventory dropped"
-			public_conclusion = S("@1 died at @2, and dropped their inventory.", player_name, pos_string)
+			log_message = "Bones placed"
+			chat_message = "@1 died at @2, and bones were placed."
 		end
 	else
-		if not dropped then
-			bones_conclusion = "Bones placed"
-			public_conclusion = S("@1 died at @2, and bones were placed.", player_name, pos_string)
+		drop(player_pos, ItemStack("bones:bones"))
+		if dropped then
+			log_message = "Inventory dropped"
+			chat_message = "@1 died at @2, and dropped their inventory."
 		else
-			bones_conclusion = "Inventory partially dropped"
-			public_conclusion = S("@1 died at @2, and partially dropped their inventory.", player_name, pos_string)
+			log_message = "No bones placed"
+			chat_message = "@1 died at @2."
 		end
 	end
 
 	if bones_position_message then
-		minetest.chat_send_player(player_name, public_conclusion)
+		chat_message = S(chat_message, player_name, pos_string)
+		minetest.chat_send_player(player_name, chat_message)
 	end
 
-	minetest.log("action", player_name .. " dies at " .. pos_string .. ". " .. bones_conclusion)
+	minetest.log("action", player_name .. " dies at " .. pos_string .. ". " .. log_message)
 
 	if bones_inv then
-		local inv_size = theoretical_max_slots
-		for i = 1, theoretical_max_slots do
+		local inv_size = bones_max_slots
+		for i = 1, bones_max_slots do
 			local stack = bones_inv:get_stack("main", i)
 			if stack:get_count() == 0 then
 				inv_size = i - 1
 				break
 			end
 		end
-		if inv_size <= 4 * 8 then
-			bones_inv:set_size("main", 4 * 8)
+		if inv_size <= min_inv_size then
+			bones_inv:set_size("main", min_inv_size)
 		else
 			bones_inv:set_size("main", inv_size)
 		end
