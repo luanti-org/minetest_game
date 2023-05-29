@@ -320,14 +320,14 @@ minetest.register_on_dieplayer(function(player)
 		return
 	end
 
-	local all_inventory = collect_all_items(player)
-	if bones_mode == "bones" and #all_inventory > 0 then
+	local all_items = collect_all_items(player)
+	if bones_mode == "bones" and #all_items > 0 then
 		bones_mode, bones_pos, bones_inv, bones_meta = find_node_for_bones_on_player_death(player, player_pos)
 	end
-	if bones_mode == "drop" and #all_inventory > 0 then
-		all_inventory.insert(all_inventory,ItemStack("bones:bones"))
+	if bones_mode == "drop" and #all_items > 0 then
+		table.insert(all_items, ItemStack("bones:bones"))
 	end
-	local dropped = dump_into(bones_mode, bones_inv, bones_pos, all_inventory)
+	local dropped = dump_into(bones_mode, bones_inv, bones_pos, all_items)
 
 	local log_message
 	local chat_message
