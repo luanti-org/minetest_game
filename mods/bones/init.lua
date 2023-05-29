@@ -246,13 +246,12 @@ end
 bones.register_dead_player_inv_management(player_dies_transfer_inventory)
 
 local function collect_all_items(player)
-	local all_inventory = {}
+	local all_items = {}
 	for _, fun in ipairs(dead_player_callbacks) do
 		local items = fun(player)
-		-- https://www.programming-idioms.org/idiom/166/concatenate-two-lists/3812/lua
-		table.move(items, 1, #items, #all_inventory + 1, all_inventory)
+		table.insert_all(all_items, items)
 	end
-	return all_inventory
+	return all_items
 end
 
 -- check if it's possible to place bones, if not find space near player
