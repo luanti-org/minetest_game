@@ -245,6 +245,58 @@ end
 
 bones.register_dead_player_inv_management(player_dies_transfer_inventory)
 
+local function collect_all_items(player)
+	local all_inventory = {}
+	for _, fun in ipairs(dead_player_callbacks) do
+		local items = fun(player)
+		-- https://www.programming-idioms.org/idiom/166/concatenate-two-lists/3812/lua
+		table.move(items, 1, #items, #all_inventory + 1, all_inventory)
+	end
+	return all_inventory
+end
+
+-- check if it's possible to place bones, if not find space near player
+local function find_node_for_bones_on_player_death(player, player_pos)
+	local bones_pos = nil
+	local bones_inv = nil
+	local bones_meta = nil
+	local bones_mode = "bones"
+	bones_pos = player_pos
+	local air
+	if may_replace(bones_pos, player) then
+		air = bones_pos
+	else
+		air = minetest.find_node_near(bones_pos, 1, {"air"})
+	end
+
+	if air and not minetest.is_protected(air, player_name) then
+		bones_pos = air
+		local param2 = minetest.dir_to_facedir(player:get_look_dir())
+		minetest.set_node(bones_pos, {name = "bones:bones", param2 = param2})
+		bones_meta = minetest.get_meta(bones_pos)
+		bones_inv = bones_meta:get_inventory()
+		--make it so big that anything reasonable will for sure fit inside
+		bones_inv:set_size("main", bones_max_slots)
+	else
+		bones_mode = "drop"
+		bones_pos = nil
+	end
+	return bones_mode, bones_pos, bones_inv, bones_meta
+end
+
+local function dump_into(bones_mode, bones_inv, bones_pos, all_inventory)
+	local dropped = false
+	for _, item in ipairs(all_inventory) do
+		if bones_mode == "bones" and bones_inv:room_for_item("main", item) then
+			bones_inv:add_item("main", item)
+		else
+			drop(player_pos, item)
+			dropped = true
+		end
+	end
+	return dropped
+end
+
 minetest.register_on_dieplayer(function(player)
 	local player_pos = vector.round(player:get_pos())
 	local bones_mode = minetest.settings:get("bones_mode") or "bones"
@@ -254,7 +306,6 @@ minetest.register_on_dieplayer(function(player)
 	local player_name = player:get_player_name()
 	local bones_inv = nil
 	local bones_pos = nil
-	local dropped = false
 	local bones_meta = nil
 
 	local bones_position_message = minetest.settings:get_bool("bones_position_message") == true
@@ -270,41 +321,14 @@ minetest.register_on_dieplayer(function(player)
 		return
 	end
 
-	for _, fun in ipairs(dead_player_callbacks) do
-		local items = fun(player)
-		for _, item in ipairs(items) do
-			-- check if it's possible to place bones, if not find space near player
-			if bones_mode == "bones" and bones_pos == nil then
-				bones_pos = player_pos
-				local air
-				if may_replace(bones_pos, player) then
-					air = bones_pos
-				else
-					air = minetest.find_node_near(bones_pos, 1, {"air"})
-				end
-
-				if air and not minetest.is_protected(air, player_name) then
-					bones_pos = air
-					local param2 = minetest.dir_to_facedir(player:get_look_dir())
-					minetest.set_node(bones_pos, {name = "bones:bones", param2 = param2})
-					bones_meta = minetest.get_meta(bones_pos)
-					bones_inv = bones_meta:get_inventory()
-					--make it so big that anything reasonable will for sure fit inside
-					bones_inv:set_size("main", bones_max_slots)
-				else
-					bones_mode = "drop"
-					bones_pos = nil
-				end
-			end
-
-			if bones_mode == "bones" and bones_inv:room_for_item("main", item) then
-				bones_inv:add_item("main", item)
-			else
-				drop(player_pos, item)
-				dropped=true
-			end
-		end
+	local all_inventory = collect_all_items(player)
+	if bones_mode == "bones" and #all_inventory > 0 then
+		bones_mode, bones_pos, bones_inv, bones_meta = find_node_for_bones_on_player_death(player, player_pos)
 	end
+	if bones_mode == "drop" and #all_inventory > 0 then
+		all_inventory.insert(all_inventory,ItemStack("bones:bones"))
+	end
+	local dropped = dump_into(bones_mode, bones_inv, bones_pos, all_inventory)
 
 	local log_message
 	local chat_message
