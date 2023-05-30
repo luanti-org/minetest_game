@@ -17,7 +17,7 @@ read_globals = {
 	"Settings",
 	"unpack",
 	-- Silence errors about custom table methods.
-	table = { fields = { "copy", "indexof" } },
+	table = { fields = { "copy", "indexof", "insert_all" } },
 	-- Silence warnings about accessing undefined fields of global 'math'
 	math = { fields = { "sign" } }
 }
