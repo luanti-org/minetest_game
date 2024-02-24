@@ -264,9 +264,6 @@ local function find_bones_pos(player)
 	else
 		bones_pos = minetest.find_node_near(rounded_player_pos, 1, {"air"})
 	end
-	if minetest.is_protected(bones_pos, player:get_player_name()) then
-		bones_pos = nil
-	end
 	return bones_pos
 end
 
