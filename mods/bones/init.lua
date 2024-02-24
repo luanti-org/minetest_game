@@ -11,6 +11,9 @@ local min_inv_size = 4 * 8 -- display and provide at least this many slots
 
 bones = {}
 
+local function TRANSLATEMEPLEASE(s)
+	return s
+end
 
 local function is_owner(pos, name)
 	local owner = minetest.get_meta(pos):get_string("owner")
@@ -356,18 +359,18 @@ minetest.register_on_dieplayer(function(player)
 	if bones_placed then
 		if drop_bones then
 			log_message = "Inventory partially dropped"
-			chat_message = "@1 died at @2, and partially dropped their inventory."
+			chat_message = TRANSLATEMEPLEASE("@1 died at @2, and partially dropped their inventory.")
 		else
 			log_message = "Bones placed"
-			chat_message = "@1 died at @2, and bones were placed."
+			chat_message = TRANSLATEMEPLEASE("@1 died at @2, and bones were placed.")
 		end
 	else
 		if drop_bones then
 			log_message = "Inventory dropped"
-			chat_message = "@1 died at @2, and dropped their inventory."
+			chat_message = TRANSLATEMEPLEASE("@1 died at @2, and dropped their inventory.")
 		else
 			log_message = "No bones placed"
-			chat_message = "@1 died at @2."
+			chat_message = TRANSLATEMEPLEASE("@1 died at @2.")
 		end
 	end
 
