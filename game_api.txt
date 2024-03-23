@@ -87,7 +87,7 @@ Additionally, callbacks can be registered to transfer items to the bones on deat
 
 `bones.register_collect_items(callback)`
 
-Functions registered this way won't be called if `bones_mode` is `keep`.
+Functions registered this way won't be called if `bones_mode` is `keep` or in case of the death of a creative player.
 
 `callback` is a `function(player)` which `return`s a table of items to be transferred.
 
