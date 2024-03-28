@@ -6,7 +6,7 @@
 -- Load support for MT game translation.
 local S = minetest.get_translator("bones")
 
-local bones_max_slots = minetest.settings:get("bones_max_slots") or 15 * 10
+local bones_max_slots = tonumber(minetest.settings:get("bones_max_slots")) or 15 * 10
 local min_inv_size = 4 * 8 -- display and provide at least this many slots
 
 bones = {}
