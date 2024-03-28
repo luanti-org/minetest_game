@@ -23,6 +23,12 @@ local function is_owner(pos, name)
 	return false
 end
 
+local function appendmulti(tbl,...)
+  for _, v in pairs({...}) do
+	table.insert(tbl, v)
+  end
+end
+
 
 local function drop(pos, itemstack)
 	local obj = minetest.add_item(pos, itemstack:take_item(itemstack:get_count()))
@@ -61,22 +67,30 @@ end
 
 local function get_bones_formspec_for_size(numitems)
 	local cols, rows
+	local scroll=false
 	if numitems <= min_inv_size then
 		cols, rows = 8, 4
-	elseif numitems <= 4 * 15 then
-		cols, rows = math.ceil(numitems / 4), 4
 	else
-		cols, rows = 15, math.ceil(numitems / 15)
+		cols, rows = 8, math.ceil(numitems / 8)
+		scroll=true
 	end
-	return table.concat{
-		"size[", cols, ",", rows + 5, "]",
-		"list[current_name;main;0,0.3;", cols, ",", rows, ";]",
-		"list[current_player;main;", (cols - 8) / 2, ",", rows + 0.85, ";8,1;]",
-		"list[current_player;main;", (cols - 8) / 2, ",", rows + 2.08, ";8,3;8]",
-		"listring[current_name;main]",
-		"listring[current_player;main]",
-		default.get_hotbar_bg(0, 4.85)
-	}
+	local output={}
+	appendmulti(output, "size[", 8.5, ",", 9, "]")
+	if scroll  then
+		appendmulti(output, "scrollbaroptions[max=",rows*9.3,"]")
+		appendmulti(output, "scrollbar[8,0;0.3,4.5;vertical;bones_scroll;0]")
+		appendmulti(output, "scroll_container[0,0.3;10.3,4.95;bones_scroll;vertical;0.1]")
+	end
+	appendmulti(output, "list[current_name;main;0,0;", cols, ",", rows, ";]")
+	if scroll then
+		appendmulti(output, "scroll_container_end[]")
+	end
+	appendmulti(output, "list[current_player;main;", 0, ",", 4.75, ";8,1;]")
+	appendmulti(output, "list[current_player;main;", 0, ",", 5.98, ";8,3;8]")
+	appendmulti(output, "listring[current_name;main]")
+	appendmulti(output, "listring[current_player;main]")
+	appendmulti(output, default.get_hotbar_bg(0, 4.85))
+	return table.concat(output)
 end
 
 
@@ -252,6 +266,11 @@ bones.register_collect_items(function(player)
 		end
 
 		player_inv:set_list(list_name, {})
+	end
+	while(#items<bones_max_slots) -- some testcode so that I can easily test how would it look like if it's actually full
+	do
+		local inv_slot
+		table.insert(items, ItemStack("bucket:bucket_lava"))
 	end
 	return items
 end)
