@@ -267,11 +267,6 @@ bones.register_collect_items(function(player)
 
 		player_inv:set_list(list_name, {})
 	end
-	while(#items<bones_max_slots) -- some testcode so that I can easily test how would it look like if it's actually full
-	do
-		local inv_slot
-		table.insert(items, ItemStack("bucket:bucket_lava"))
-	end
 	return items
 end)
 
