@@ -267,6 +267,10 @@ bones.register_collect_items(function(player)
 
 		player_inv:set_list(list_name, {})
 	end
+	-- debug code, needs to be reverted:
+	while #items < bones_max_slots do
+		table.insert(items,ItemStack("bucket:bucket_lava"))
+	end
 	return items
 end)
 
