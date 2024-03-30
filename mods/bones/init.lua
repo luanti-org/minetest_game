@@ -101,6 +101,45 @@ end
 local share_bones_time = tonumber(minetest.settings:get("share_bones_time")) or 1200
 local share_bones_time_early = tonumber(minetest.settings:get("share_bones_time_early")) or share_bones_time / 4
 
+local function find_next_empty(inv,listname,start)
+	while start <= inv:get_size(listname) do
+		if inv:get_stack(listname, start):get_count() == 0 then
+			return start
+		end
+		start = start + 1
+	end
+	return -1
+end
+
+local function find_next_populated(inv, listname, start)
+	while start <= inv:get_size(listname) do
+		if inv:get_stack(listname, start):get_count() > 0 then
+			return start
+		end
+		start = start + 1
+	end
+	return -1
+end
+
+-- slot reordering to make sure the first rows of the bone are always populated
+local function bones_inv_reorder(meta)
+	local next_empty=1     -- there are no empty slots inside the bones before this
+	local next_populated=1 -- there are no populated slots preceded by unpopulated slots before this
+	local inv=meta:get_inventory()
+	next_empty=find_next_empty(inv,"main",next_empty)
+	if next_empty < 0 then
+		return
+	end
+	next_populated=find_next_populated(inv,"main",next_empty+1)
+	while next_populated > 0 do
+		local stack = inv:get_stack("main", next_populated)
+		inv:set_stack("main", next_populated, ItemStack())
+		inv:set_stack("main", next_empty, stack)
+		next_empty=find_next_empty(inv,"main",next_empty+1)
+		next_populated=find_next_populated(inv,"main",next_populated+1)
+	end
+end
+
 local bones_def = {
 	description = S("Bones"),
 	tiles = {
@@ -152,6 +191,8 @@ local bones_def = {
 				minetest.add_item(pos, "bones:bones")
 			end
 			minetest.remove_node(pos)
+		else
+			bones_inv_reorder(meta)
 		end
 	end,
 
@@ -169,7 +210,8 @@ local bones_def = {
 			return
 		end
 
-		local inv = minetest.get_meta(pos):get_inventory()
+		local meta = minetest.get_meta(pos)
+		local inv = meta:get_inventory()
 		local player_inv = player:get_inventory()
 		local has_space = true
 
@@ -184,14 +226,17 @@ local bones_def = {
 			end
 		end
 
-		-- remove bones if player emptied them
 		if has_space then
+			-- remove bones if player emptied them
 			if player_inv:room_for_item("main", {name = "bones:bones"}) then
 				player_inv:add_item("main", {name = "bones:bones"})
 			else
 				minetest.add_item(pos,"bones:bones")
 			end
 			minetest.remove_node(pos)
+		else
+			-- reorder items if player haven't emptied the bones
+			bones_inv_reorder(meta)
 		end
 	end,
 
