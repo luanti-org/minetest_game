@@ -123,8 +123,8 @@ end
 
 -- slot reordering to make sure the first rows of the bone are always populated
 local function bones_inv_reorder(meta)
-	local next_empty=1     -- there are no empty slots inside the bones before this
-	local next_populated=1 -- there are no populated slots preceded by unpopulated slots before this
+	local next_empty=1   -- there are no empty slots inside the bones before this
+	local next_populated -- there are no populated slots preceded by unpopulated slots before this
 	local inv=meta:get_inventory()
 	next_empty=find_next_empty(inv,"main",next_empty)
 	if next_empty < 0 then
