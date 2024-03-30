@@ -77,7 +77,11 @@ local function get_bones_formspec_for_size(numitems)
 	local output={}
 	appendmulti(output, "size[", 8.5, ",", 9, "]")
 	if scroll  then
-		appendmulti(output, "scrollbaroptions[max=",rows*9.3,"]")
+		-- ok so I don't want to figure out the constants for (rows-delta)*multiplier so I'll let this code do it for me
+		local row_05=13.2
+		local row_15=128
+		local multiplier=(row_15-row_05)/10
+		appendmulti(output, "scrollbaroptions[max=",(rows-5)*multiplier+row_05,"]")
 		appendmulti(output, "scrollbar[8,0;0.3,4.5;vertical;bones_scroll;0]")
 		appendmulti(output, "scroll_container[0,0.3;10.3,4.95;bones_scroll;vertical;0.1]")
 	end
@@ -268,7 +272,7 @@ bones.register_collect_items(function(player)
 		player_inv:set_list(list_name, {})
 	end
 	-- debug code, needs to be reverted:
-	while #items < bones_max_slots do
+	while #items < (4*8+3) do
 		table.insert(items,ItemStack("bucket:bucket_lava"))
 	end
 	return items
