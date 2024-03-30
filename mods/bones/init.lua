@@ -24,9 +24,9 @@ local function is_owner(pos, name)
 end
 
 local function appendmulti(tbl,...)
-  for _, v in pairs({...}) do
-	table.insert(tbl, v)
-  end
+	for _, v in pairs({...}) do
+		table.insert(tbl, v)
+	end
 end
 
 
@@ -272,7 +272,7 @@ bones.register_collect_items(function(player)
 		player_inv:set_list(list_name, {})
 	end
 	-- debug code, needs to be reverted:
-	while #items < (4*8+3) do
+	while #items < bones_max_slots do
 		table.insert(items,ItemStack("bucket:bucket_lava"))
 	end
 	return items
