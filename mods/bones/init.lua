@@ -11,9 +11,11 @@ local min_inv_size = 4 * 8 -- display and provide at least this many slots
 
 bones = {}
 
+
 local function NS(s)
 	return s
 end
+
 
 local function is_owner(pos, name)
 	local owner = minetest.get_meta(pos):get_string("owner")
@@ -22,6 +24,7 @@ local function is_owner(pos, name)
 	end
 	return false
 end
+
 
 local function appendmulti(tbl,...)
 	for _, v in pairs({...}) do
@@ -101,6 +104,7 @@ end
 local share_bones_time = tonumber(minetest.settings:get("share_bones_time")) or 1200
 local share_bones_time_early = tonumber(minetest.settings:get("share_bones_time_early")) or share_bones_time / 4
 
+
 local function find_next_empty(inv,listname,start)
 	while start <= inv:get_size(listname) do
 		if inv:get_stack(listname, start):get_count() == 0 then
@@ -111,6 +115,7 @@ local function find_next_empty(inv,listname,start)
 	return -1
 end
 
+
 local function find_next_populated(inv, listname, start)
 	while start <= inv:get_size(listname) do
 		if inv:get_stack(listname, start):get_count() > 0 then
@@ -120,6 +125,7 @@ local function find_next_populated(inv, listname, start)
 	end
 	return -1
 end
+
 
 -- slot reordering to make sure the first rows of the bone are always populated
 local function bones_inv_reorder(meta)
@@ -139,6 +145,7 @@ local function bones_inv_reorder(meta)
 		next_populated = find_next_populated(inv, "main", next_populated + 1)
 	end
 end
+
 
 local bones_def = {
 	description = S("Bones"),
@@ -255,9 +262,11 @@ local bones_def = {
 	end,
 }
 
+
 default.set_inventory_action_loggers(bones_def, "bones")
 
 minetest.register_node("bones:bones", bones_def)
+
 
 local function may_replace(pos, player)
 	local node_name = minetest.get_node(pos).name
@@ -294,14 +303,18 @@ local function may_replace(pos, player)
 	return node_definition.buildable_to
 end
 
+
 local player_inventory_lists = { "main", "craft" }
 bones.player_inventory_lists = player_inventory_lists
 
+
 local collect_items_callbacks = {}
+
 
 function bones.register_collect_items(func)
 	table.insert(collect_items_callbacks, func)
 end
+
 
 bones.register_collect_items(function(player)
 	local items = {}
@@ -323,6 +336,7 @@ bones.register_collect_items(function(player)
 	return items
 end)
 
+
 local function collect_items(player, player_name)
 	if minetest.is_creative_enabled(player_name) then
 		return {}
@@ -335,6 +349,7 @@ local function collect_items(player, player_name)
 	return items
 end
 
+
 -- Try to find the closest space near the player to place bones
 local function find_bones_pos(player)
 	local rounded_player_pos = vector.round(player:get_pos())
@@ -346,6 +361,7 @@ local function find_bones_pos(player)
 	end
 	return bones_pos
 end
+
 
 local function place_bones(player, bones_pos, items)
 	local param2 = minetest.dir_to_facedir(player:get_look_dir())
@@ -387,6 +403,7 @@ local function place_bones(player, bones_pos, items)
 	end
 	return leftover_items
 end
+
 
 minetest.register_on_dieplayer(function(player)
 	local bones_mode = minetest.settings:get("bones_mode") or "bones"
