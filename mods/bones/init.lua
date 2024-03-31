@@ -338,10 +338,6 @@ end)
 
 
 local function collect_items(player, player_name)
-	if minetest.is_creative_enabled(player_name) then
-		return {}
-	end
-
 	local items = {}
 	for _, cb in ipairs(collect_items_callbacks) do
 		table.insert_all(items, cb(player))
@@ -416,9 +412,15 @@ minetest.register_on_dieplayer(function(player)
 	local bones_position_message = minetest.settings:get_bool("bones_position_message") == true
 	local pos_string = minetest.pos_to_string(player:get_pos())
 
-	local items = collect_items(player, player_name)
+	local items = {}
 
-	if bones_mode == "keep" or #items == 0 then
+	if not minetest.is_creative_enabled(player_name) and
+			bones_mode ~= "keep"
+	then
+		items = collect_items(player, player_name)
+	end
+
+	if #items == 0 then
 		minetest.log("action", player_name .. " dies at " .. pos_string ..
 			". No bones placed")
 		if bones_position_message then
