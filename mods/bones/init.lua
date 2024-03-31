@@ -339,8 +339,8 @@ end)
 
 local function collect_items(player, player_name)
 	local items = {}
-	for _, cb in ipairs(collect_items_callbacks) do
-		table.insert_all(items, cb(player))
+	for _, callback in ipairs(collect_items_callbacks) do
+		table.insert_all(items, callback(player))
 	end
 	return items
 end
