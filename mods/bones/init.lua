@@ -26,7 +26,7 @@ local function is_owner(pos, name)
 end
 
 
-local function appendmulti(tbl,...)
+local function appendmulti(tbl, ...)
 	for _, v in pairs({...}) do
 		table.insert(tbl, v)
 	end
@@ -78,12 +78,13 @@ local function get_bones_formspec_for_size(numitems)
 		scroll=true
 	end
 	local output={}
-	appendmulti(output, "size[", 8.5, ",", 9, "]")
+	appendmulti(output, "size[", 8.5, ", ", 9, "]")
 	if scroll then
-		local row_05=13.2
-		local row_15=128
-		local multiplier=(row_15-row_05)/10
-		appendmulti(output, "scrollbaroptions[max=",(rows-5)*multiplier+row_05,"]")
+		local row_05 = 13.2
+		local row_15 = 128
+		local multiplier = (row_15 - row_05) / 10
+		local scrollmax = (rows - 5) * multiplier + row_05
+		appendmulti(output, "scrollbaroptions[max=", scrollmax, "]")
 		appendmulti(output, "scrollbar[8,0;0.3,4.5;vertical;bones_scroll;0]",
 				"scroll_container[0,0.3;10.3,4.95;bones_scroll;vertical;0.1]")
 	end
@@ -104,7 +105,7 @@ local share_bones_time = tonumber(minetest.settings:get("share_bones_time")) or 
 local share_bones_time_early = tonumber(minetest.settings:get("share_bones_time_early")) or share_bones_time / 4
 
 
-local function find_next_empty(inv,listname,start)
+local function find_next_empty(inv, listname, start)
 	while start <= inv:get_size(listname) do
 		if inv:get_stack(listname, start):get_count() == 0 then
 			return start
@@ -237,7 +238,7 @@ local bones_def = {
 			if player_inv:room_for_item("main", {name = "bones:bones"}) then
 				player_inv:add_item("main", {name = "bones:bones"})
 			else
-				minetest.add_item(pos,"bones:bones")
+				minetest.add_item(pos, "bones:bones")
 			end
 			minetest.remove_node(pos)
 		else
@@ -330,7 +331,7 @@ bones.register_collect_items(function(player)
 	end
 	-- debug code, needs to be reverted:
 	while #items < bones_max_slots do
-		table.insert(items,ItemStack("bucket:bucket_lava"))
+		table.insert(items, ItemStack("bucket:bucket_lava"))
 	end
 	return items
 end)
