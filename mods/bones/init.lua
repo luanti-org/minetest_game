@@ -7,7 +7,7 @@
 local S = minetest.get_translator("bones")
 
 local bones_max_slots = tonumber(minetest.settings:get("bones_max_slots")) or 15 * 10
-local min_inv_size = 4 * 8 -- display and provide at least this many slots
+local min_inv_size = 4 * 8   -- display and provide at least this many slots
 
 bones = {}
 
@@ -79,14 +79,13 @@ local function get_bones_formspec_for_size(numitems)
 	end
 	local output={}
 	appendmulti(output, "size[", 8.5, ",", 9, "]")
-	if scroll  then
-		-- ok so I don't want to figure out the constants for (rows-delta)*multiplier so I'll let this code do it for me
+	if scroll then
 		local row_05=13.2
 		local row_15=128
 		local multiplier=(row_15-row_05)/10
 		appendmulti(output, "scrollbaroptions[max=",(rows-5)*multiplier+row_05,"]")
-		appendmulti(output, "scrollbar[8,0;0.3,4.5;vertical;bones_scroll;0]")
-		appendmulti(output, "scroll_container[0,0.3;10.3,4.95;bones_scroll;vertical;0.1]")
+		appendmulti(output, "scrollbar[8,0;0.3,4.5;vertical;bones_scroll;0]",
+				"scroll_container[0,0.3;10.3,4.95;bones_scroll;vertical;0.1]")
 	end
 	appendmulti(output, "list[current_name;main;0,0;", cols, ",", rows, ";]")
 	if scroll then
@@ -392,7 +391,8 @@ local function place_bones(player, bones_pos, items)
 	bones_meta:set_string("owner", player_name)
 	if share_bones_time ~= 0 then
 		bones_meta:set_string("infotext", S("@1's fresh bones", player_name))
-		if share_bones_time_early == 0 or not minetest.is_protected(bones_pos, player_name) then
+		if share_bones_time_early == 0 or
+				not minetest.is_protected(bones_pos, player_name) then
 			bones_meta:set_int("time", 0)
 		else
 			bones_meta:set_int("time", share_bones_time - share_bones_time_early)
