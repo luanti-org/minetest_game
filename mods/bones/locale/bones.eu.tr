@@ -1,0 +1,8 @@
+# textdomain: bones
+Bones=Hezurrak
+@1's old bones=@1-en hezur zaharrak
+@1 died at @2.=@1 @2-n hil da.
+@1 died at @2, and dropped their inventory.=@1 @2-n hil da, inbentarioa bertan utziz.
+@1 died at @2, and bones were placed.=@1 @2-n hil da, eta hezurrak bertan geratu dira.
+@1's fresh bones= @1-en hezur freskoak
+@1's bones=@1-en hezurrak
