@@ -2609,6 +2609,7 @@ local function register_sign(material, desc, def)
 				minetest.record_protection_violation(pos, player_name)
 				return
 			end
+			if not fields.quit then return end
 			local text = fields.text
 			if not text then
 				return
