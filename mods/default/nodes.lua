@@ -2605,7 +2605,7 @@ local function register_sign(material, desc, def)
 		end,
 		on_receive_fields = function(pos, formname, fields, sender)
 			if not fields.quit then
-				return
+				return -- workaround for https://github.com/luanti-org/luanti/issues/16187
 			end
 			local player_name = sender:get_player_name()
 			if minetest.is_protected(pos, player_name) then
