@@ -2604,12 +2604,14 @@ local function register_sign(material, desc, def)
 			meta:set_string("formspec", "field[text;;${text}]")
 		end,
 		on_receive_fields = function(pos, formname, fields, sender)
+			if not fields.quit then
+				return
+			end
 			local player_name = sender:get_player_name()
 			if minetest.is_protected(pos, player_name) then
 				minetest.record_protection_violation(pos, player_name)
 				return
 			end
-			if not fields.quit then return end
 			local text = fields.text
 			if not text then
 				return
