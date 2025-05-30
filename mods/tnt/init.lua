@@ -332,6 +332,9 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 
 	vm1:set_data(data)
 	vm1:write_to_map()
+	if vm1.close ~= nil then
+		vm1:close()
+	end
 
 	-- recalculate new radius
 	radius = math.floor(radius * math.pow(count, 1/3))
@@ -386,8 +389,10 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 
 	vm:set_data(data)
 	vm:write_to_map()
-	vm:update_map()
 	vm:update_liquids()
+	if vm.close ~= nil then
+		vm:close()
+	end
 
 	-- call check_single_for_falling for everything within 1.5x blast radius
 	for y = -radius * 1.5, radius * 1.5 do
