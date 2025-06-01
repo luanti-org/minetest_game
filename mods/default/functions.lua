@@ -835,3 +835,17 @@ function default.can_interact_with_node(player, pos)
 
 	return false
 end
+
+function default.do_with_area(p1, p2, func)
+	local vm = VoxelManip()
+	local minp, maxp = vm:read_from_map(p1, p2)
+	local va = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
+	local data = vm:get_data()
+	func(va, data)
+	vm:set_data(data)
+	vm:write_to_map()
+	vm:update_liquids()
+	if vm.close ~= nil then
+		vm:close()
+	end
+end
