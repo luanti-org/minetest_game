@@ -9,6 +9,7 @@ read_globals = {
 	"DIR_DELIM",
 	"core",
 	"minetest",
+	"core",
 	"dump",
 	"vector",
 	"VoxelManip", "VoxelArea",

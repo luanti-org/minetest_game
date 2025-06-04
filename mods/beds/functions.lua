@@ -170,12 +170,23 @@ end
 
 -- Public functions
 
+function beds.kick(player)
+	lay_down(player, nil, nil, false)
+end
+
 function beds.kick_players()
-	for name, _ in pairs(beds.player) do
-		local player = minetest.get_player_by_name(name)
-		lay_down(player, nil, nil, false)
+	for name in pairs(beds.player) do
+		beds.kick(core.get_player_by_name(name))
 	end
 end
+
+core.register_globalstep(function()
+	for name, bed_pos in pairs(beds.bed_position) do
+		if not beds.is_bed_node[core.get_node(bed_pos).name] then
+			beds.kick(core.get_player_by_name(name))
+		end
+	end
+end)
 
 function beds.skip_night()
 	minetest.set_timeofday(0.23)
