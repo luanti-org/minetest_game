@@ -148,6 +148,11 @@ minetest.register_craftitem("bucket:bucket_empty", {
 
 			-- default set to return filled bucket
 			local giving_back = liquiddef.itemname
+			if giving_back:sub(1,1) == ":" then
+				--overwrite with removed prepending colon if present in itemname
+				--for cases where mods and submods use the same namespace
+                		giving_back = giving_back:sub(2)
+			end
 
 			-- check if holding more than 1 empty bucket
 			if item_count > 1 then
