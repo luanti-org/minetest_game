@@ -83,6 +83,17 @@ in `bones.player_inventory_lists`.
 
 e.g. `table.insert(bones.player_inventory_lists, "backpack")`
 
+Additionally, callbacks can be registered to transfer items to the bones on death:
+
+`bones.register_collect_items(callback)`
+
+Functions registered this way won't be called if `bones_mode` is `keep` or in case of the death of a creative player.
+
+`callback` is a `function(player)` which `return`s a table of items to be transferred.
+
+Please note that this does not remove the items from the inventory they were taken of.
+Disposing of the items in this inventory is the `callback`'s responsibility.
+
 
 Creative API
 ------------

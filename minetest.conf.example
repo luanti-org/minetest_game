@@ -13,6 +13,9 @@
 #   keep: Player keeps items.
 #bones_mode = bones
 
+# Sets the maximum item slots inside a bones node. Anything above this limit will be dropped
+#bones_max_slots = 150
+
 # The time in seconds after which the bones of a dead player can be looted by
 # everyone.
 # 0 to disable.
