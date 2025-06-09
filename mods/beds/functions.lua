@@ -6,8 +6,8 @@ if enable_respawn == nil then
 end
 
 -- Physics override management mods (shadow the global variable)
-local player_monoids = core.get_modpath("player_monoids") and player_monoids
-local pova           = core.get_modpath("pova")           and pova
+local player_monoids = core.get_modpath("player_monoids") and _G["player_monoids"]
+local pova           = core.get_modpath("pova")           and _G["pova"]
 
 if player_monoids and not player_monoids.speed.checkout_branch then
 	-- This function exists since 2025-05-17
