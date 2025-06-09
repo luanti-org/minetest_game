@@ -54,7 +54,7 @@ function bucket.register_liquid(source, flowing, itemname, inventory_image, name
 	bucket.liquids[source] = {
 		source = source,
 		flowing = flowing,
-		itemname = itemname,
+		itemname = itemname:sub(1,1) == ":" and itemname:sub(2) or itemname,
 		force_renew = force_renew,
 	}
 	bucket.liquids[flowing] = bucket.liquids[source]
@@ -116,10 +116,6 @@ function bucket.register_liquid(source, flowing, itemname, inventory_image, name
 				return ItemStack("bucket:bucket_empty")
 			end
 		})
-		if itemname:sub(1,1) == ":" then
-			-- If the itemname starts with a colon, correct that
-			bucket.liquids[source]["itemname"] = itemname:sub(2)
-		end
 	end
 end
 
