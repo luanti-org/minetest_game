@@ -6,8 +6,8 @@ if enable_respawn == nil then
 end
 
 -- Physics override management mods (shadow the global variable)
-local player_monoids = core.get_modpath("player_monoids") and _G["player_monoids"]
-local pova           = core.get_modpath("pova")           and _G["pova"]
+local player_monoids = core.get_modpath("player_monoids") and player_monoids
+local pova           = core.get_modpath("pova")           and pova
 
 if player_monoids and not player_monoids.speed.checkout_branch then
 	-- This function exists since 2025-05-17
@@ -80,7 +80,7 @@ local function set_physics_override(player, put_to_bed)
 			pova.add_override(name, "force", OVERRIDES)
 			pova.do_override(player)
 		else
-			-- Fall back to default. May conflict with other mods.
+			-- Directly use engine API. May conflict with other mods.
 			pdata.physics_override = player:get_physics_override()
 			player:set_physics_override(OVERRIDES)
 		end

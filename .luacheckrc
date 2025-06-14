@@ -19,7 +19,10 @@ read_globals = {
 	-- Silence errors about custom table methods.
 	table = { fields = { "copy", "indexof" } },
 	-- Silence warnings about accessing undefined fields of global 'math'
-	math = { fields = { "sign" } }
+	math = { fields = { "sign" } },
+	-- Mod support
+	"player_monoids",
+	"pova",
 }
 
 -- Overwrites minetest.handle_node_drops
