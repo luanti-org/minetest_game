@@ -52,7 +52,7 @@ end
 function bucket.register_liquid(source, flowing, itemname, inventory_image, name,
 		groups, force_renew)
 	local itemname_raw = itemname
-	itemname = itemname and itemname:match(":(.+)") or itemname
+	itemname = itemname and itemname:match("^:(.+)") or itemname
 	bucket.liquids[source] = {
 		source = source,
 		flowing = flowing,
