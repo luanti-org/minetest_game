@@ -294,12 +294,8 @@ end
 local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owner, explode_center)
 	pos = vector.round(pos)
 	-- scan for adjacent TNT nodes first, and enlarge the explosion
-	local vm1 = VoxelManip()
-	local p1 = vector.subtract(pos, 2)
-	local p2 = vector.add(pos, 2)
-	local minp, maxp = vm1:read_from_map(p1, p2)
-	local a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
-	local data = vm1:get_data()
+	-- TODO given that we're looking at a fraction of a mapblock here,
+	-- there is probably little reason to use VoxelManip.
 	local count = 0
 	local c_tnt
 	local c_tnt_burning = minetest.get_content_id("tnt:tnt_burning")
@@ -311,88 +307,74 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	else
 		c_tnt = c_tnt_burning -- tnt is not registered if disabled
 	end
-	-- make sure we still have explosion even when centre node isnt tnt related
-	if explode_center then
-		count = 1
-	end
 
-	for z = pos.z - 2, pos.z + 2 do
-	for y = pos.y - 2, pos.y + 2 do
-		local vi = a:index(pos.x - 2, y, z)
-		for x = pos.x - 2, pos.x + 2 do
-			local cid = data[vi]
-			if cid == c_tnt or cid == c_tnt_boom or cid == c_tnt_burning then
-				count = count + 1
-				data[vi] = c_air
-			end
-			vi = vi + 1
+	default.do_with_area(pos:subtract(2), pos:add(2), function(a, data)
+		-- make sure we still have explosion even when centre node isnt tnt related
+		if explode_center then
+			count = 1
 		end
-	end
-	end
 
-	vm1:set_data(data)
-	vm1:write_to_map()
-	if vm1.close ~= nil then
-		vm1:close()
-	end
+		for z = pos.z - 2, pos.z + 2 do
+		for y = pos.y - 2, pos.y + 2 do
+			local vi = a:index(pos.x - 2, y, z)
+			for x = pos.x - 2, pos.x + 2 do
+				local cid = data[vi]
+				if cid == c_tnt or cid == c_tnt_boom or cid == c_tnt_burning then
+					count = count + 1
+					data[vi] = c_air
+				end
+				vi = vi + 1
+			end
+		end
+		end
+	end)
 
 	-- recalculate new radius
 	radius = math.floor(radius * math.pow(count, 1/3))
 
 	-- perform the explosion
-	local vm = VoxelManip()
 	local pr = PseudoRandom(os.time())
-	p1 = vector.subtract(pos, radius)
-	p2 = vector.add(pos, radius)
-	minp, maxp = vm:read_from_map(p1, p2)
-	a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
-	data = vm:get_data()
-
 	local drops = {}
 	local on_blast_queue = {}
 	local on_construct_queue = {}
 	basic_flame_on_construct = minetest.registered_nodes["fire:basic_flame"].on_construct
 
-	-- Used to efficiently remove metadata of nodes that were destroyed.
-	-- Metadata is probably sparse, so this may save us some work.
-	local has_meta = {}
-	for _, p in ipairs(minetest.find_nodes_with_meta(p1, p2)) do
-		has_meta[a:indexp(p)] = true
-	end
+	local p1, p2 = pos:subtract(radius), pos:add(radius)
+	default.do_with_area(p1, p2, function(a, data) -- luacheck: ignore
+		-- Used to efficiently remove metadata of nodes that were destroyed.
+		-- Metadata is probably sparse, so this may save us some work.
+		local has_meta = {}
+		for _, p in ipairs(minetest.find_nodes_with_meta(p1, p2)) do
+			has_meta[a:indexp(p)] = true
+		end
 
-	local c_fire = minetest.get_content_id("fire:basic_flame")
-	for z = -radius, radius do
-	for y = -radius, radius do
-	local vi = a:index(pos.x + (-radius), pos.y + y, pos.z + z)
-	for x = -radius, radius do
-		local r = vector.length(vector.new(x, y, z))
-		if (radius * radius) / (r * r) >= (pr:next(80, 125) / 100) then
-			local cid = data[vi]
-			local p = {x = pos.x + x, y = pos.y + y, z = pos.z + z}
-			if cid ~= c_air and cid ~= c_ignore then
-				local new_cid = destroy(drops, p, cid, c_air, c_fire,
-					on_blast_queue, on_construct_queue,
-					ignore_protection, ignore_on_blast, owner)
+		local c_fire = minetest.get_content_id("fire:basic_flame")
+		for z = -radius, radius do
+		for y = -radius, radius do
+		local vi = a:index(pos.x + (-radius), pos.y + y, pos.z + z)
+		for x = -radius, radius do
+			local r = vector.length(vector.new(x, y, z))
+			if (radius * radius) / (r * r) >= (pr:next(80, 125) / 100) then
+				local cid = data[vi]
+				local p = {x = pos.x + x, y = pos.y + y, z = pos.z + z}
+				if cid ~= c_air and cid ~= c_ignore then
+					local new_cid = destroy(drops, p, cid, c_air, c_fire,
+						on_blast_queue, on_construct_queue,
+						ignore_protection, ignore_on_blast, owner)
 
-				if new_cid ~= data[vi] then
-					data[vi] = new_cid
-					if has_meta[vi] then
-						minetest.get_meta(p):from_table(nil)
+					if new_cid ~= data[vi] then
+						data[vi] = new_cid
+						if has_meta[vi] then
+							minetest.get_meta(p):from_table(nil)
+						end
 					end
 				end
 			end
+			vi = vi + 1
 		end
-		vi = vi + 1
-	end
-	end
-	end
-
-	vm:set_data(data)
-	vm:write_to_map()
-	vm:update_liquids()
-	if vm.close ~= nil then
-		vm:close()
-	end
+		end
+		end
+	end)
 
 	-- call check_single_for_falling for everything within 1.5x blast radius
 	for y = -radius * 1.5, radius * 1.5 do
