@@ -35,6 +35,7 @@ The bucket API allows registering new types of buckets for non-default liquids.
 
 The filled bucket item is returned to the player that uses an empty bucket pointing to the given liquid source.
 When punching with an empty bucket pointing to an entity or a non-liquid node, the on_punch of the entity or node will be triggered.
+The bucket API also allows registering buckets in other namespace using colon-prefixed itemname (i.e. ":cows:bucket_milk").
 
 
 Beds API
