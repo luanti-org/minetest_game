@@ -51,6 +51,8 @@ end
 -- This function can be called from any mod (that depends on bucket).
 function bucket.register_liquid(source, flowing, itemname, inventory_image, name,
 		groups, force_renew)
+	local itemname_raw = itemname
+	itemname = itemname and itemname:match(":(.+)") or itemname
 	bucket.liquids[source] = {
 		source = source,
 		flowing = flowing,
@@ -60,7 +62,7 @@ function bucket.register_liquid(source, flowing, itemname, inventory_image, name
 	bucket.liquids[flowing] = bucket.liquids[source]
 
 	if itemname ~= nil then
-		minetest.register_craftitem(itemname, {
+		minetest.register_craftitem(itemname_raw, {
 			description = name,
 			inventory_image = inventory_image,
 			stack_max = 1,
