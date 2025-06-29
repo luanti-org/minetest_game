@@ -66,15 +66,6 @@ local success = false
 local spawn_pos = {}
 
 
--- Get world 'mapgen_limit' and 'chunksize' to calculate 'spawn_limit'.
--- This accounts for how mapchunks are not generated if they or their shell exceed
--- 'mapgen_limit'.
-
-local mapgen_limit = tonumber(minetest.get_mapgen_setting("mapgen_limit"))
-local chunksize = tonumber(minetest.get_mapgen_setting("chunksize"))
-local spawn_limit = math.max(mapgen_limit - (chunksize + 1) * 16, 0)
-
-
 -- Functions
 ------------
 
@@ -103,6 +94,7 @@ end
 -- Spawn position search
 
 local function search()
+	local edge1, edge2 = core.get_mapgen_edges()
 	for iter = 1, checks do
 		local biome_data = minetest.get_biome_data(pos)
 		-- Sometimes biome_data is nil
@@ -116,7 +108,7 @@ local function search()
 
 		pos = next_pos()
 		-- Check for position being outside world edge
-		if math.abs(pos.x) > spawn_limit or math.abs(pos.z) > spawn_limit then
+		if pos.x < edge1.x or pos.z < edge1.z or pos.x > edge2.x or pos.z > edge2.z then
 			return false
 		end
 	end
