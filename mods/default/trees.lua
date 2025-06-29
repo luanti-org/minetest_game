@@ -115,26 +115,13 @@ function default.grow_tree(pos, is_apple_tree, bad)
 		error("Deprecated use of default.grow_tree")
 	end
 
-	local x, y, z = pos.x, pos.y, pos.z
 	local height = random(4, 5)
 	local c_tree = minetest.get_content_id("default:tree")
 	local c_leaves = minetest.get_content_id("default:leaves")
 
-	local vm = minetest.get_voxel_manip()
-	local minp, maxp = vm:read_from_map(
-		{x = x - 2, y = y, z = z - 2},
-		{x = x + 2, y = y + height + 1, z = z + 2}
-	)
-	local a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
-	local data = vm:get_data()
-
-	add_trunk_and_leaves(data, a, pos, c_tree, c_leaves, height, 2, 8, is_apple_tree)
-
-	vm:set_data(data)
-	vm:write_to_map()
-	if vm.close ~= nil then
-		vm:close()
-	end
+	default.do_with_area(pos:offset(-2, 0, -2), pos:offset(2, height + 1, 2), function(a, data)
+		add_trunk_and_leaves(data, a, pos, c_tree, c_leaves, height, 2, 8, is_apple_tree)
+	end)
 end
 
 -- Jungle tree
@@ -156,39 +143,27 @@ function default.grow_jungle_tree(pos, bad)
 	local c_jungletree = minetest.get_content_id("default:jungletree")
 	local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
 
-	local vm = minetest.get_voxel_manip()
-	local minp, maxp = vm:read_from_map(
-		{x = x - 3, y = y - 1, z = z - 3},
-		{x = x + 3, y = y + height + 1, z = z + 3}
-	)
-	local a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
-	local data = vm:get_data()
+	default.do_with_area(pos:offset(-3, -1, -3), pos:offset(3, height + 1, 3), function(a, data)
+		add_trunk_and_leaves(data, a, pos, c_jungletree, c_jungleleaves,
+			height, 3, 30, false)
 
-	add_trunk_and_leaves(data, a, pos, c_jungletree, c_jungleleaves,
-		height, 3, 30, false)
-
-	-- Roots
-	for z_dist = -1, 1 do
-		local vi_1 = a:index(x - 1, y - 1, z + z_dist)
-		local vi_2 = a:index(x - 1, y, z + z_dist)
-		for x_dist = -1, 1 do
-			if random(1, 3) >= 2 then
-				if data[vi_1] == c_air or data[vi_1] == c_ignore then
-					data[vi_1] = c_jungletree
-				elseif data[vi_2] == c_air or data[vi_2] == c_ignore then
-					data[vi_2] = c_jungletree
+		-- Roots
+		for z_dist = -1, 1 do
+			local vi_1 = a:index(x - 1, y - 1, z + z_dist)
+			local vi_2 = a:index(x - 1, y, z + z_dist)
+			for x_dist = -1, 1 do
+				if random(1, 3) >= 2 then
+					if data[vi_1] == c_air or data[vi_1] == c_ignore then
+						data[vi_1] = c_jungletree
+					elseif data[vi_2] == c_air or data[vi_2] == c_ignore then
+						data[vi_2] = c_jungletree
+					end
 				end
+				vi_1 = vi_1 + 1
+				vi_2 = vi_2 + 1
 			end
-			vi_1 = vi_1 + 1
-			vi_2 = vi_2 + 1
 		end
-	end
-
-	vm:set_data(data)
-	vm:write_to_map()
-	if vm.close ~= nil then
-		vm:close()
-	end
+	end)
 end
 
 
@@ -218,105 +193,93 @@ function default.grow_pine_tree(pos, snow)
 	local c_pine_needles  = minetest.get_content_id("default:pine_needles")
 	local c_snow = minetest.get_content_id("default:snow")
 
-	local vm = minetest.get_voxel_manip()
-	local minp, maxp = vm:read_from_map(
-		{x = x - 3, y = y, z = z - 3},
-		{x = x + 3, y = maxy + 3, z = z + 3}
-	)
-	local a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
-	local data = vm:get_data()
+	default.do_with_area(pos:offset(-3, 0, -3), vector.new(x + 3, maxy + 3, z + 3), function(a, data)
+		-- Upper branches layer
+		local dev = 3
+		for yy = maxy - 1, maxy + 1 do
+			for zz = z - dev, z + dev do
+				local vi = a:index(x - dev, yy, zz)
+				local via = a:index(x - dev, yy + 1, zz)
+				for xx = x - dev, x + dev do
+					if random() < 0.95 - dev * 0.05 then
+						add_pine_needles(data, vi, c_air, c_ignore, c_snow,
+							c_pine_needles)
+						if snow then
+							add_snow(data, via, c_air, c_ignore, c_snow)
+						end
+					end
+					vi  = vi + 1
+					via = via + 1
+				end
+			end
+			dev = dev - 1
+		end
 
-	-- Upper branches layer
-	local dev = 3
-	for yy = maxy - 1, maxy + 1 do
-		for zz = z - dev, z + dev do
-			local vi = a:index(x - dev, yy, zz)
-			local via = a:index(x - dev, yy + 1, zz)
-			for xx = x - dev, x + dev do
-				if random() < 0.95 - dev * 0.05 then
+		-- Centre top nodes
+		add_pine_needles(data, a:index(x, maxy + 1, z), c_air, c_ignore, c_snow,
+			c_pine_needles)
+		add_pine_needles(data, a:index(x, maxy + 2, z), c_air, c_ignore, c_snow,
+			c_pine_needles) -- Paramat added a pointy top node
+		if snow then
+			add_snow(data, a:index(x, maxy + 3, z), c_air, c_ignore, c_snow)
+		end
+
+		-- Lower branches layer
+		local my = 0
+		for i = 1, 20 do -- Random 2x2 squares of needles
+			local xi = x + random(-3, 2)
+			local yy = maxy + random(-6, -5)
+			local zi = z + random(-3, 2)
+			if yy > my then
+				my = yy
+			end
+			for zz = zi, zi+1 do
+				local vi = a:index(xi, yy, zz)
+				local via = a:index(xi, yy + 1, zz)
+				for xx = xi, xi + 1 do
 					add_pine_needles(data, vi, c_air, c_ignore, c_snow,
 						c_pine_needles)
 					if snow then
 						add_snow(data, via, c_air, c_ignore, c_snow)
 					end
+					vi  = vi + 1
+					via = via + 1
 				end
-				vi  = vi + 1
-				via = via + 1
 			end
 		end
-		dev = dev - 1
-	end
 
-	-- Centre top nodes
-	add_pine_needles(data, a:index(x, maxy + 1, z), c_air, c_ignore, c_snow,
-		c_pine_needles)
-	add_pine_needles(data, a:index(x, maxy + 2, z), c_air, c_ignore, c_snow,
-		c_pine_needles) -- Paramat added a pointy top node
-	if snow then
-		add_snow(data, a:index(x, maxy + 3, z), c_air, c_ignore, c_snow)
-	end
-
-	-- Lower branches layer
-	local my = 0
-	for i = 1, 20 do -- Random 2x2 squares of needles
-		local xi = x + random(-3, 2)
-		local yy = maxy + random(-6, -5)
-		local zi = z + random(-3, 2)
-		if yy > my then
-			my = yy
-		end
-		for zz = zi, zi+1 do
-			local vi = a:index(xi, yy, zz)
-			local via = a:index(xi, yy + 1, zz)
-			for xx = xi, xi + 1 do
-				add_pine_needles(data, vi, c_air, c_ignore, c_snow,
-					c_pine_needles)
-				if snow then
-					add_snow(data, via, c_air, c_ignore, c_snow)
-				end
-				vi  = vi + 1
-				via = via + 1
-			end
-		end
-	end
-
-	dev = 2
-	for yy = my + 1, my + 2 do
-		for zz = z - dev, z + dev do
-			local vi = a:index(x - dev, yy, zz)
-			local via = a:index(x - dev, yy + 1, zz)
-			for xx = x - dev, x + dev do
-				if random() < 0.95 - dev * 0.05 then
-					add_pine_needles(data, vi, c_air, c_ignore, c_snow,
-						c_pine_needles)
-					if snow then
-						add_snow(data, via, c_air, c_ignore, c_snow)
+		dev = 2
+		for yy = my + 1, my + 2 do
+			for zz = z - dev, z + dev do
+				local vi = a:index(x - dev, yy, zz)
+				local via = a:index(x - dev, yy + 1, zz)
+				for xx = x - dev, x + dev do
+					if random() < 0.95 - dev * 0.05 then
+						add_pine_needles(data, vi, c_air, c_ignore, c_snow,
+							c_pine_needles)
+						if snow then
+							add_snow(data, via, c_air, c_ignore, c_snow)
+						end
 					end
+					vi  = vi + 1
+					via = via + 1
 				end
-				vi  = vi + 1
-				via = via + 1
+			end
+			dev = dev - 1
+		end
+
+		-- Trunk
+		-- Force-place lowest trunk node to replace sapling
+		data[a:index(x, y, z)] = c_pine_tree
+		for yy = y + 1, maxy do
+			local vi = a:index(x, yy, z)
+			local node_id = data[vi]
+			if node_id == c_air or node_id == c_ignore or
+					node_id == c_pine_needles or node_id == c_snow then
+				data[vi] = c_pine_tree
 			end
 		end
-		dev = dev - 1
-	end
-
-	-- Trunk
-	-- Force-place lowest trunk node to replace sapling
-	data[a:index(x, y, z)] = c_pine_tree
-	for yy = y + 1, maxy do
-		local vi = a:index(x, yy, z)
-		local node_id = data[vi]
-		if node_id == c_air or node_id == c_ignore or
-				node_id == c_pine_needles or node_id == c_snow then
-			data[vi] = c_pine_tree
-		end
-	end
-
-	vm:set_data(data)
-	vm:write_to_map()
-	if vm.close ~= nil then
-		vm:close()
-	end
+	end)
 end
 
 
