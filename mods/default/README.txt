@@ -262,6 +262,8 @@ Glass breaking sounds (CC BY 3.0):
   3: http://www.freesound.org/people/lsprice/sounds/88808/
 
 Mito551 (sounds) (CC BY-SA 3.0):
+  default_dig_cracky.ogg
+  default_dug_cracky.*.ogg
   default_dig_crumbly.*.ogg
   default_dig_dig_immediate.ogg
   default_dig_oddly_breakable_by_hand.ogg
