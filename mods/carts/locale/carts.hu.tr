@@ -1,0 +1,6 @@
+# textdomain: carts
+Cart=Bányakocsi
+(Sneak+Click to pick up)=(Lopakodás+klikk a felvételhez)
+Rail=Sín
+Powered Rail=Villamos sín
+Brake Rail=Fékező sín

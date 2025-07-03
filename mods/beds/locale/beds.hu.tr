@@ -1,0 +1,10 @@
+# textdomain: beds
+Fancy Bed=Szép ágy
+Simple Bed=Egyszerű ágy
+This bed is already occupied!=Ez az ágy már foglalt!
+You have to stop moving before going to bed!=Meg kell állnod, mielőtt lefeküdhetnél!
+Good morning.=Jó reggelt.
+@1 of @2 players are in bed=@2 játékosból @1 van ágyban 
+Force night skip=Éjszaka átugrása
+You can only sleep at night.=Csak éjszaka aludhatsz.
+Leave Bed=Ágy elhagyása
