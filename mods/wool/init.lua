@@ -26,6 +26,12 @@ for i = 1, #dyes do
 	}
 end
 
+-- Alternative recipe for strings.
+minetest.register_craft({
+	output = "farming:string 4",
+	recipe = {{"group:wool"}},
+})
+		
 -- Legacy
 -- Backwards compatibility with jordach's 16-color wool mod
 minetest.register_alias("wool:dark_blue", "wool:blue")
