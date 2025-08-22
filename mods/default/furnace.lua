@@ -114,6 +114,14 @@ local function swap_node(pos, name)
 	minetest.swap_node(pos, node)
 end
 
+local function add_item(inv, pos, item)
+	local leftover = inv:add_item("dst", item)
+	if not leftover:is_empty() then
+		local drop_pos = minetest.find_node_near(pos, 1, {"air"})
+		minetest.item_drop(item, nil, drop_pos)
+	end
+end
+
 local function furnace_node_timer(pos, elapsed)
 	--
 	-- Initialize metadata
@@ -169,6 +177,10 @@ local function furnace_node_timer(pos, elapsed)
 						inv:set_stack("src", 1, aftercooked.items[1])
 						src_time = src_time - cooked.time
 						update = true
+						-- add replacement item to dst so they arent lost
+						if cooked.replacements[1] then
+							add_item(inv, pos, cooked.replacements[1])
+						end
 					else
 						dst_full = true
 					end
@@ -202,12 +214,7 @@ local function furnace_node_timer(pos, elapsed)
 					-- Put replacements in dst list or drop them on the furnace.
 					local replacements = fuel.replacements
 					if replacements[1] then
-						local leftover = inv:add_item("dst", replacements[1])
-						if not leftover:is_empty() then
-							local above = vector.new(pos.x, pos.y + 1, pos.z)
-							local drop_pos = minetest.find_node_near(above, 1, {"air"}) or above
-							minetest.item_drop(replacements[1], nil, drop_pos)
-						end
+						add_item(inv, pos, replacements[1])
 					end
 					update = true
 					fuel_totaltime = fuel.time + (fuel_totaltime - fuel_time)
