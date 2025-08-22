@@ -117,7 +117,8 @@ end
 local function add_item(inv, pos, item)
 	local leftover = inv:add_item("dst", item)
 	if not leftover:is_empty() then
-		local drop_pos = minetest.find_node_near(pos, 1, {"air"})
+		local above = vector.new(pos.x, pos.y + 1, pos.z)
+		local drop_pos = minetest.find_node_near(pos, 1, {"air"}) or above
 		minetest.item_drop(item, nil, drop_pos)
 	end
 end
