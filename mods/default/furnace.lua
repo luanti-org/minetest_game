@@ -53,19 +53,19 @@ end
 --
 
 local function can_dig(pos, player)
-	local meta = minetest.get_meta(pos);
+	local meta = core.get_meta(pos)
 	local inv = meta:get_inventory()
 	return inv:is_empty("fuel") and inv:is_empty("dst") and inv:is_empty("src")
 end
 
 local function allow_metadata_inventory_put(pos, listname, index, stack, player)
-	if minetest.is_protected(pos, player:get_player_name()) then
+	if core.is_protected(pos, player:get_player_name()) then
 		return 0
 	end
-	local meta = minetest.get_meta(pos)
+	local meta = core.get_meta(pos)
 	local inv = meta:get_inventory()
 	if listname == "fuel" then
-		if minetest.get_craft_result({method="fuel", width=1, items={stack}}).time ~= 0 then
+		if core.get_craft_result({method="fuel", width=1, items={stack}}).time ~= 0 then
 			if inv:is_empty("src") then
 				meta:set_string("infotext", S("Furnace is empty"))
 			end
@@ -81,45 +81,45 @@ local function allow_metadata_inventory_put(pos, listname, index, stack, player)
 end
 
 local function allow_metadata_inventory_move(pos, from_list, from_index, to_list, to_index, count, player)
-	local meta = minetest.get_meta(pos)
+	local meta = core.get_meta(pos)
 	local inv = meta:get_inventory()
 	local stack = inv:get_stack(from_list, from_index)
 	return allow_metadata_inventory_put(pos, to_list, to_index, stack, player)
 end
 
 local function allow_metadata_inventory_take(pos, listname, index, stack, player)
-	if minetest.is_protected(pos, player:get_player_name()) then
+	if core.is_protected(pos, player:get_player_name()) then
 		return 0
 	end
 	return stack:get_count()
 end
 
 local function stop_furnace_sound(pos, fadeout_step)
-	local hash = minetest.hash_node_position(pos)
+	local hash = core.hash_node_position(pos)
 	local sound_ids = furnace_fire_sounds[hash]
 	if sound_ids then
 		for _, sound_id in ipairs(sound_ids) do
-			minetest.sound_fade(sound_id, -1, 0)
+			core.sound_fade(sound_id, -1, 0)
 		end
 		furnace_fire_sounds[hash] = nil
 	end
 end
 
 local function swap_node(pos, name)
-	local node = minetest.get_node(pos)
+	local node = core.get_node(pos)
 	if node.name == name then
 		return
 	end
 	node.name = name
-	minetest.swap_node(pos, node)
+	core.swap_node(pos, node)
 end
 
-local function add_item(inv, pos, item)
+local function add_item_or_drop(inv, pos, item)
 	local leftover = inv:add_item("dst", item)
 	if not leftover:is_empty() then
 		local above = vector.offset(pos, 0, 1, 0)
-		local drop_pos = minetest.find_node_near(pos, 1, {"air"}) or above
-		minetest.item_drop(item, nil, drop_pos)
+		local drop_pos = core.find_node_near(pos, 1, {"air"}) or above
+		core.item_drop(leftover, nil, drop_pos)
 	end
 end
 
@@ -127,7 +127,7 @@ local function furnace_node_timer(pos, elapsed)
 	--
 	-- Initialize metadata
 	--
-	local meta = minetest.get_meta(pos)
+	local meta = core.get_meta(pos)
 	local fuel_time = meta:get_float("fuel_time") or 0
 	local src_time = meta:get_float("src_time") or 0
 	local fuel_totaltime = meta:get_float("fuel_totaltime") or 0
@@ -141,7 +141,6 @@ local function furnace_node_timer(pos, elapsed)
 
 	local cookable, cooked
 	local fuel
-
 	local update = true
 	local items_smelt = 0
 	while elapsed > 0 and update do
@@ -156,7 +155,7 @@ local function furnace_node_timer(pos, elapsed)
 
 		-- Check if we have cookable content
 		local aftercooked
-		cooked, aftercooked = minetest.get_craft_result({method = "cooking", width = 1, items = srclist})
+		cooked, aftercooked = core.get_craft_result({method = "cooking", width = 1, items = srclist})
 		cookable = cooked.time ~= 0
 
 		local el = math.min(elapsed, fuel_totaltime - fuel_time)
@@ -180,7 +179,7 @@ local function furnace_node_timer(pos, elapsed)
 						update = true
 						-- add replacement item to dst so they arent lost
 						if cooked.replacements[1] then
-							add_item(inv, pos, cooked.replacements[1])
+							add_item_or_drop(inv, pos, cooked.replacements[1])
 						end
 					else
 						dst_full = true
@@ -196,7 +195,7 @@ local function furnace_node_timer(pos, elapsed)
 			if cookable then
 				-- We need to get new fuel
 				local afterfuel
-				fuel, afterfuel = minetest.get_craft_result({method = "fuel", width = 1, items = fuellist})
+				fuel, afterfuel = core.get_craft_result({method = "fuel", width = 1, items = fuellist})
 
 				if fuel.time == 0 then
 					-- No valid fuel in fuel list
@@ -204,7 +203,7 @@ local function furnace_node_timer(pos, elapsed)
 					src_time = 0
 				else
 					-- prevent blocking of fuel inventory (for automatization mods)
-					local is_fuel = minetest.get_craft_result({method = "fuel", width = 1, items = {afterfuel.items[1]:to_string()}})
+					local is_fuel = core.get_craft_result({method = "fuel", width = 1, items = {afterfuel.items[1]:to_string()}})
 					if is_fuel.time == 0 then
 						table.insert(fuel.replacements, afterfuel.items[1])
 						inv:set_stack("fuel", 1, "")
@@ -215,7 +214,7 @@ local function furnace_node_timer(pos, elapsed)
 					-- Put replacements in dst list or drop them on the furnace.
 					local replacements = fuel.replacements
 					if replacements[1] then
-						add_item(inv, pos, replacements[1])
+						add_item_or_drop(inv, pos, replacements[1])
 					end
 					update = true
 					fuel_totaltime = fuel.time + (fuel_totaltime - fuel_time)
@@ -233,7 +232,7 @@ local function furnace_node_timer(pos, elapsed)
 
 	if items_smelt > 0 then
 		-- Play cooling sound
-		minetest.sound_play("default_cool_lava",
+		core.sound_play("default_cool_lava",
 			{ pos = pos, max_hear_distance = 16, gain = 0.07 * math.min(items_smelt, 7) }, true)
 	end
 	if fuel and fuel_totaltime > fuel.time then
@@ -279,9 +278,9 @@ local function furnace_node_timer(pos, elapsed)
 
 		-- Play sound every 5 seconds while the furnace is active
 		if timer_elapsed == 0 or (timer_elapsed + 1) % 5 == 0 then
-			local sound_id = minetest.sound_play("default_furnace_active",
+			local sound_id = core.sound_play("default_furnace_active",
 				{pos = pos, max_hear_distance = 16, gain = 0.25})
-			local hash = minetest.hash_node_position(pos)
+			local hash = core.hash_node_position(pos)
 			furnace_fire_sounds[hash] = furnace_fire_sounds[hash] or {}
 			table.insert(furnace_fire_sounds[hash], sound_id)
 			-- Only remember the 3 last sound handles
@@ -289,7 +288,7 @@ local function furnace_node_timer(pos, elapsed)
 				table.remove(furnace_fire_sounds[hash], 1)
 			end
 			-- Remove the sound ID automatically from table after 11 seconds
-			minetest.after(11, function()
+			core.after(11, function()
 				if not furnace_fire_sounds[hash] then
 					return
 				end
@@ -310,7 +309,7 @@ local function furnace_node_timer(pos, elapsed)
 		formspec = default.get_furnace_inactive_formspec()
 		swap_node(pos, "default:furnace")
 		-- stop timer on the inactive furnace
-		minetest.get_node_timer(pos):stop()
+		core.get_node_timer(pos):stop()
 		meta:set_int("timer_elapsed", 0)
 
 		stop_furnace_sound(pos)
@@ -346,7 +345,7 @@ local function apply_logger(def)
 	return def
 end
 
-minetest.register_node("default:furnace", apply_logger({
+core.register_node("default:furnace", apply_logger({
 	description = S("Furnace"),
 	tiles = {
 		"default_furnace_top.png", "default_furnace_bottom.png",
@@ -364,7 +363,7 @@ minetest.register_node("default:furnace", apply_logger({
 	on_timer = furnace_node_timer,
 
 	on_construct = function(pos)
-		local meta = minetest.get_meta(pos)
+		local meta = core.get_meta(pos)
 		local inv = meta:get_inventory()
 		inv:set_size('src', 1)
 		inv:set_size('fuel', 1)
@@ -373,15 +372,15 @@ minetest.register_node("default:furnace", apply_logger({
 	end,
 
 	on_metadata_inventory_move = function(pos)
-		minetest.get_node_timer(pos):start(1.0)
+		core.get_node_timer(pos):start(1.0)
 	end,
 	on_metadata_inventory_put = function(pos)
 		-- start timer function, it will sort out whether furnace can burn or not.
-		minetest.get_node_timer(pos):start(1.0)
+		core.get_node_timer(pos):start(1.0)
 	end,
 	on_metadata_inventory_take = function(pos)
 		-- check whether the furnace is empty or not.
-		minetest.get_node_timer(pos):start(1.0)
+		core.get_node_timer(pos):start(1.0)
 	end,
 	on_blast = function(pos)
 		local drops = {}
@@ -389,7 +388,7 @@ minetest.register_node("default:furnace", apply_logger({
 		default.get_inventory_drops(pos, "fuel", drops)
 		default.get_inventory_drops(pos, "dst", drops)
 		drops[#drops+1] = "default:furnace"
-		minetest.remove_node(pos)
+		core.remove_node(pos)
 		return drops
 	end,
 
@@ -398,7 +397,7 @@ minetest.register_node("default:furnace", apply_logger({
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
 }))
 
-minetest.register_node("default:furnace_active", apply_logger({
+core.register_node("default:furnace_active", apply_logger({
 	description = S("Furnace"),
 	tiles = {
 		"default_furnace_top.png", "default_furnace_bottom.png",
@@ -434,7 +433,7 @@ minetest.register_node("default:furnace_active", apply_logger({
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
 }))
 
-minetest.register_craft({
+core.register_craft({
 	output = "default:furnace",
 	recipe = {
 		{"group:stone", "group:stone", "group:stone"},
