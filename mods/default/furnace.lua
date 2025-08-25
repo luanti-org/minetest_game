@@ -175,6 +175,16 @@ local function furnace_node_timer(pos, elapsed)
 					if inv:room_for_item("dst", cooked.item) then
 						inv:add_item("dst", cooked.item)
 						inv:set_stack("src", 1, aftercooked.items[1])
+						-- stop any final replacement from clogging "src"
+						local can_cook = core.get_craft_result({
+								method = "cooking", width = 1,
+								items = {aftercooked.items[1]:to_string()}})
+
+						if can_cook.time == 0 and can_cook.item:to_string() == ""
+						and aftercooked.items[1]:to_string() ~= "" then
+							inv:set_stack("src", 1, "")
+							add_item_or_drop(inv, pos, aftercooked.items[1])
+						end
 						src_time = src_time - cooked.time
 						update = true
 						-- add replacement item to dst so they arent lost
