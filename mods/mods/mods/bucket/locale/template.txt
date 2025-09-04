@@ -1,0 +1,5 @@
+# textdomain: bucket
+Empty Bucket=
+Water Bucket=
+River Water Bucket=
+Lava Bucket=

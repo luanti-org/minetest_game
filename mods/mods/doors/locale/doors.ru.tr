@@ -1,0 +1,18 @@
+# textdomain: doors
+Hidden Door Segment=Спрятанная часть двери
+Owned by @1=Владелец: @1
+You do not own this locked door.=Вы не владелец этой запертой двери.
+a locked door=запертая дверь
+Wooden Door=Деревянная дверь
+Steel Door=Стальная дверь
+Glass Door=Стеклянная дверь
+Obsidian Glass Door=Дверь из обсидианового стекла
+You do not own this trapdoor.=Вы не владелец этого люка.
+a locked trapdoor=запертый люк
+Wooden Trapdoor=Деревянный люк
+Steel Trapdoor=Стальной люк
+Apple Wood Fence Gate=Яблоневая калитка
+Acacia Wood Fence Gate=Акациевая калитка
+Jungle Wood Fence Gate=Калитка из тропического дерева
+Pine Wood Fence Gate=Сосновая калитка
+Aspen Wood Fence Gate=Осиновая калитка

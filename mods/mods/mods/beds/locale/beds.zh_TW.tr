@@ -1,0 +1,10 @@
+# textdomain: beds
+Fancy Bed=花式床
+Simple Bed=簡易床
+This bed is already occupied!=這個床已經被占據了！
+You have to stop moving before going to bed!=你必須在上床前停止移動！
+Good morning.=早安！
+@1 of @2 players are in bed=@2位玩家中的@1位在床上
+Force night skip=強制跳過夜晚
+You can only sleep at night.=你只能在晚上睡覺。
+Leave Bed=離開床

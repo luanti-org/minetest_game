@@ -1,0 +1,4 @@
+# textdomain: game_commands
+Kill yourself to respawn=自杀并重生
+No static_spawnpoint defined=static_spawnpoint 未定义
+You need to be online to be killed!=您需要在线才能被杀死！

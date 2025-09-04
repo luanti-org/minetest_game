@@ -1,0 +1,8 @@
+# textdomain: bones
+Bones=Ostoj
+@1's old bones=La malfreŝaj ostoj de @1
+@1 died at @2.=@1 mortis ĉe @2
+@1 died at @2, and dropped their inventory.=@1 mortis ĉe @2, kaj delasis sian stokon.
+@1 died at @2, and bones were placed.=@1 mortis ĉe @2, kaj ostoj estas demetitaj.
+@1's fresh bones=La freŝaj ostoj de @1
+@1's bones=La ostoj de @1

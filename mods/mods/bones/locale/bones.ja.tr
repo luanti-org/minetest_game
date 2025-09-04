@@ -1,0 +1,8 @@
+# textdomain: bones
+Bones=骨
+@1's old bones=@1の古い骨
+@1 died at @2.=@1は@2で死亡しました。
+@1 died at @2, and dropped their inventory.=@1は@2で死亡して持ち物を落としました。
+@1 died at @2, and bones were placed.=@1は@2で死亡して骨が残されました。
+@1's fresh bones=@1の新鮮な骨
+@1's bones=@1の骨

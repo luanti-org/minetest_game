@@ -1,0 +1,34 @@
+# textdomain: farming
+Hoe=锄头
+Seed=种子
+Wooden Hoe=木锄头
+Stone Hoe=石锄头
+Steel Hoe=铁锄头
+Bronze Hoe=青铜锄头
+Mese Hoe=黄石锄头
+Diamond Hoe=钻石锄头
+Wheat Seed=小麦种子
+Wheat=小麦
+Flour=面粉
+Bread=面包
+Cotton Seed=棉花种子
+Cotton=棉
+String=线
+Soil=土
+Wet Soil=湿土
+Savanna Soil=草原土
+Wet Savanna Soil=湿草原土
+Desert Sand Soil=沙漠沙土
+Wet Desert Sand Soil=湿沙漠沙土
+Straw=稻草
+Straw Stair=稻草台阶
+Inner Straw Stair=稻草内楼梯
+Outer Straw Stair=稻草外楼梯
+Straw Slab=稻草板
+Wild Cotton=野棉花
+
+
+##### not used anymore #####
+
+Dry Soil=干土
+Wet Dry Soil=湿干土

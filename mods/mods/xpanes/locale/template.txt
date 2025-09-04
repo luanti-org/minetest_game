@@ -1,0 +1,6 @@
+# textdomain: xpanes
+Glass Pane=
+Obsidian Glass Pane=
+Steel Bars=
+Steel Bar Door=
+Steel Bar Trapdoor=

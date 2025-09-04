@@ -1,0 +1,12 @@
+# textdomain: flowers
+Red Rose=
+Orange Tulip=
+Yellow Dandelion=
+Green Chrysanthemum=
+Blue Geranium=
+Viola=
+White Dandelion=
+Black Tulip=
+Red Mushroom=
+Brown Mushroom=
+Waterlily=

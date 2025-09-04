@@ -1,0 +1,6 @@
+# textdomain: carts
+Cart=Vozík
+(Sneak+Click to pick up)=(Zakrádanie sa + Klik pre zdvihnutie)
+Rail=Koľajnica
+Powered Rail=Koľajnica s pohonom
+Brake Rail=Brzdná koľajnica

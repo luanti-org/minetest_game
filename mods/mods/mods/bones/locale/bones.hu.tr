@@ -1,0 +1,8 @@
+# textdomain: bones
+Bones=Csontok
+@1's old bones=@1 régi csontjai
+@1 died at @2.=@1 @2 helyen halt meg.
+@1 died at @2, and dropped their inventory.=@1 @2 helyen halt meg, és elhagyta a dolgait.
+@1 died at @2, and bones were placed.=@1 @2 helyen halt meg, és a csontok kihelyezésre kerültek.
+@1's fresh bones=@1 friss csontjai
+@1's bones=@1 csontjai

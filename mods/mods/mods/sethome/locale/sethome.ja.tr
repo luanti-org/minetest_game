@@ -1,0 +1,9 @@
+# textdomain: sethome
+This command can only be executed in-game!=
+Can use /sethome and /home=/sethomeと/homeが使えます
+Teleport you to your home point=ホーム地点にテレポートします
+Teleported to home!=ホームにテレポート！
+Set a home using /sethome=/sethomeを使ってホームを設定します
+Set your home point=ホーム地点を設定します
+Home set!=ホーム地点をセット！
+Player not found!=プレーヤーが見つかりません！

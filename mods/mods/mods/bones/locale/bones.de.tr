@@ -1,0 +1,8 @@
+# textdomain: bones
+Bones=Knochen
+@1's old bones=Alte Knochen von @1
+@1 died at @2.=@1 starb bei @2.
+@1 died at @2, and dropped their inventory.=@1 starb bei @2 und ließ das Inventar fallen.
+@1 died at @2, and bones were placed.=@1 starb bei @2 und Knochen wurden platziert.
+@1's fresh bones=Frische Knochen von @1
+@1's bones=Knochen von @1

@@ -1,0 +1,4 @@
+# textdomain: walls
+Cobblestone Wall=
+Mossy Cobblestone Wall=
+Desert Cobblestone Wall=

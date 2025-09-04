@@ -1,0 +1,8 @@
+# textdomain: bones
+Bones=Kości
+@1's old bones=Stare kości @1
+@1 died at @2.=@1 umarł w @2.
+@1 died at @2, and dropped their inventory.=@1 umarł w @2, i upuścił swój ekwipunek.
+@1 died at @2, and bones were placed.=@1 umarł w @2, kości zostały położone.
+@1's fresh bones=Świeże kości @1
+@1's bones=Kości @1

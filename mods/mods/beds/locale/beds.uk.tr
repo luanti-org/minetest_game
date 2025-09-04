@@ -1,0 +1,10 @@
+# textdomain: beds
+Fancy Bed=Гарне ліжко
+Simple Bed=Просте ліжко
+This bed is already occupied!=Це ліжко вже зайняте!
+You have to stop moving before going to bed!=Зупиніться перед тим як лягти!
+Good morning.=Доброго ранку.
+@1 of @2 players are in bed=@1 з @2 гравців(-я) у ліжку
+Force night skip=Пропустити ніч
+You can only sleep at night.=Ви можете спати лише вночі.
+Leave Bed=Встати з ліжка

@@ -1,0 +1,34 @@
+# textdomain: farming
+Hoe=Aitzurra
+Seed=Hazia
+Wooden Hoe=Zurezko aitzurra
+Stone Hoe=Harrizko aitzurra
+Steel Hoe=Altzairuzko aitzurra
+Bronze Hoe=Brontzezko aitzurra
+Mese Hoe=Hileko aitzurra
+Diamond Hoe=Diamantezko aitzurra
+Wheat Seed=Gari-hazia
+Wheat=Garia
+Flour=Irina
+Bread=Ogia
+Cotton Seed=Kotoi-hazia
+Cotton=Kotoia
+String=Haria
+Soil=Laborantza-lurra
+Wet Soil=Labore-lur ketsua
+Savanna Soil=Sabanako lurra
+Wet Savanna Soil=Sabanako lur hezea
+Desert Sand Soil=Basamortuko harea lantzeko lurra
+Wet Desert Sand Soil=Basamortuko harea lantzeko lur hezea
+Straw=Lastoa
+Straw Stair=Lastozko eskailera
+Inner Straw Stair=Barruko lastozko eskailera
+Outer Straw Stair=Kanpoko lastozko eskailera
+Straw Slab=Lastozko lauza
+Wild Cotton=Basa-kotoia
+
+
+##### not used anymore #####
+
+Dry Soil=Labore lehorreko lurra
+Wet Dry Soil=Lehor-ke laborantzako lurra

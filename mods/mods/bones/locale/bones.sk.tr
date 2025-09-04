@@ -1,0 +1,8 @@
+# textdomain: bones
+Bones=Kosti
+@1's old bones=Staré kosti hráča @1
+@1 died at @2.=@1 zomrel na pozícií @2.
+@1 died at @2, and dropped their inventory.=@1 zomrel na pozícií @2 a vysypal svoj inventár.
+@1 died at @2, and bones were placed.=@1 zomrel na pozícií @2 a ostali po ňom kosti.
+@1's fresh bones=Čerstvé kosti hráča @1
+@1's bones=Kosti hráča  @1

@@ -1,0 +1,16 @@
+# textdomain: dye
+White Dye=
+Grey Dye=
+Dark Grey Dye=
+Black Dye=
+Violet Dye=
+Blue Dye=
+Cyan Dye=
+Dark Green Dye=
+Green Dye=
+Yellow Dye=
+Brown Dye=
+Orange Dye=
+Red Dye=
+Magenta Dye=
+Pink Dye=

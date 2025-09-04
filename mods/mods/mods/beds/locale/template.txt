@@ -1,0 +1,10 @@
+# textdomain: beds
+Fancy Bed=
+Simple Bed=
+This bed is already occupied!=
+You have to stop moving before going to bed!=
+Good morning.=
+@1 of @2 players are in bed=
+Force night skip=
+You can only sleep at night.=
+Leave Bed=

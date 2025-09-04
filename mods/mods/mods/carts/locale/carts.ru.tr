@@ -1,0 +1,6 @@
+# textdomain: carts
+Cart=Вагонетка
+(Sneak+Click to pick up)=(Пригнитесь и кликните по вагонетке, чтобы забрать)
+Rail=Рельсы
+Powered Rail=Ускоряющие рельсы
+Brake Rail=Тормозящие рельсы

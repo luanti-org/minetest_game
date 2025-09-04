@@ -1,0 +1,60 @@
+License of source code
+----------------------
+
+GNU Lesser General Public License, version 2.1
+Copyright (C) 2011 celeron55, Perttu Ahola <celeron55@gmail.com>
+Copyright (C) 2011 Various Minetest Game developers and contributors
+
+This program is free software; you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software Foundation;
+either version 2.1 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License for more details:
+https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+
+
+Licenses of media (textures, models and sounds)
+-----------------------------------------------
+
+Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
+Copyright (C) 2011 celeron55, Perttu Ahola <celeron55@gmail.com>
+Copyright (C) 2012 MirceaKitsune
+Copyright (C) 2012 Jordach
+Copyright (C) 2015 kilbith
+Copyright (C) 2016 sofar
+Copyright (C) 2016 xunto
+Copyright (C) 2016 Rogier-5
+Copyright (C) 2017 TeTpaAka
+Copyright (C) 2017 Desour
+Copyright (C) 2018 stujones11
+Copyright (C) 2019 An0n3m0us
+
+You are free to:
+Share — copy and redistribute the material in any medium or format.
+Adapt — remix, transform, and build upon the material for any purpose, even commercially.
+The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+Under the following terms:
+
+Attribution — You must give appropriate credit, provide a link to the license, and
+indicate if changes were made. You may do so in any reasonable manner, but not in any way
+that suggests the licensor endorses you or your use.
+
+ShareAlike — If you remix, transform, or build upon the material, you must distribute
+your contributions under the same license as the original.
+
+No additional restrictions — You may not apply legal terms or technological measures that
+legally restrict others from doing anything the license permits.
+
+Notices:
+
+You do not have to comply with the license for elements of the material in the public
+domain or where your use is permitted by an applicable exception or limitation.
+No warranties are given. The license may not give you all of the permissions necessary
+for your intended use. For example, other rights such as publicity, privacy, or moral
+rights may limit how you use the material.
+
+For more details:
+http://creativecommons.org/licenses/by-sa/3.0/

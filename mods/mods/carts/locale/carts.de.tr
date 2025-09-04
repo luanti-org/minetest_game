@@ -1,0 +1,6 @@
+# textdomain: carts
+Cart=Lore
+(Sneak+Click to pick up)=(Schleichen u. Klicken zum Aufheben)
+Rail=Schiene
+Powered Rail=Antriebsschiene
+Brake Rail=Bremsschiene

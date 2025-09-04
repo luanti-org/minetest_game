@@ -1,0 +1,8 @@
+# textdomain: bones
+Bones=Tulang
+@1's old bones=Tulang lama @1
+@1 died at @2.=@1 mati di @2.
+@1 died at @2, and dropped their inventory.=@1 mati di @2 dan meninggalkan barangnya.
+@1 died at @2, and bones were placed.=@1 mati di @2 dan tulangnya diletakkan.
+@1's fresh bones=Tulang segar @1
+@1's bones=Tulang @1

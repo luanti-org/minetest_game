@@ -1,0 +1,34 @@
+# textdomain: farming
+Hoe=
+Seed=
+Wooden Hoe=Azada de madera
+Stone Hoe=Azada de piedra
+Steel Hoe=Azada de acero
+Bronze Hoe=Azada de bronce
+Mese Hoe=Azada de mese
+Diamond Hoe=Azada de diamante
+Wheat Seed=Semilla de trigo
+Wheat=Trigo
+Flour=Harina
+Bread=Pan
+Cotton Seed=Semilla de algodón
+Cotton=Algodón
+String=Hilo
+Soil=Tierra de cultivo
+Wet Soil=Tierra de cultivo humeda
+Savanna Soil=
+Wet Savanna Soil=
+Desert Sand Soil=Tierra de cultivo de arena de desierto
+Wet Desert Sand Soil=Tierra de cultivo de arena de desierto humeda
+Straw=Paja
+Straw Stair=Escalera de paja
+Inner Straw Stair=Escalera de paja interior
+Outer Straw Stair=Escalera de paja exterior
+Straw Slab=Losa de paja
+Wild Cotton=Algodón silvestre
+
+
+##### not used anymore #####
+
+Dry Soil=Tierra de cultivo seca
+Wet Dry Soil=Tierra de cultivo seca-humeda

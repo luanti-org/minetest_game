@@ -1,0 +1,4 @@
+# textdomain: game_commands
+Kill yourself to respawn=Zastosować komendę kill aby się zrespawnować
+No static_spawnpoint defined=Nie zdefiniowano static_spawnpoint
+You need to be online to be killed!=Musisz być online aby zastosować komendę kill

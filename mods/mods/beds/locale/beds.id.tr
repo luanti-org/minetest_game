@@ -1,0 +1,10 @@
+# textdomain: beds
+Fancy Bed=Ranjang Mewah
+Simple Bed=Ranjang Sederhana
+This bed is already occupied!=Ranjang telah terisi!
+You have to stop moving before going to bed!=Anda harus diam untuk tidur!
+Good morning.=Selamat pagi.
+@1 of @2 players are in bed=@1 dari @2 pemain sedang tidur
+Force night skip=Paksa lewati malam
+You can only sleep at night.=Anda hanya bisa tidur pada waktu malam.
+Leave Bed=Tinggalkan Ranjang

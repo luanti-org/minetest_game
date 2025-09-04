@@ -1,0 +1,10 @@
+# textdomain: beds
+Fancy Bed=Katil Beragam
+Simple Bed=Katil Biasa
+This bed is already occupied!=Katil ini sudah diduduki!
+You have to stop moving before going to bed!=Anda perlu berhenti bergerak sebelum tidur!
+Good morning.=Selamat pagi.
+@1 of @2 players are in bed=@1 daripada @2 pemain sedang tidur
+Force night skip=Paksa langkau malam
+You can only sleep at night.=Anda hanya boleh tidur pada waktu malam.
+Leave Bed=Tinggalkan Katil

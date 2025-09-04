@@ -1,0 +1,4 @@
+# textdomain: butterflies
+White Butterfly=
+Red Butterfly=
+Violet Butterfly=

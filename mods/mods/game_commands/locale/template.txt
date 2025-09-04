@@ -1,0 +1,4 @@
+# textdomain: game_commands
+Kill yourself to respawn=
+No static_spawnpoint defined=
+You need to be online to be killed!=

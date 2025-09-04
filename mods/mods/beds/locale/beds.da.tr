@@ -1,0 +1,10 @@
+# textdomain: beds
+Fancy Bed=Luksuriøs seng
+Simple Bed=Simpel seng
+This bed is already occupied!=Denne seng er allerede taget!
+You have to stop moving before going to bed!=Du skal stoppe med at bevæge dig før du går i seng!
+Good morning.=God morgen.
+@1 of @2 players are in bed=@1 af @2 spillere er i seng
+Force night skip=Tvungen natte-overspring
+You can only sleep at night.=Du kan kun sove om natten.
+Leave Bed=Stå ud af sengen

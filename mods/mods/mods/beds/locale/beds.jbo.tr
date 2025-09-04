@@ -1,0 +1,10 @@
+# textdomain: beds
+Fancy Bed=lo selja'i ckana
+Simple Bed=lo sampu ckana
+This bed is already occupied!=.i lo ti ckana cu canlu
+You have to stop moving before going to bed!=lo nu do cando cu sarcu lo nu do sipna
+Good morning.=.i .uise'inai cerni
+@1 of @2 players are in bed=.i @1 cmima be lu'i @2 le pilno cu vreta lo ckana
+Force night skip=bapli le nu co'u nicte
+You can only sleep at night.=.i steci le ka nicte kei fa le ka do kakne le ka sipna ca pa ckaji be ce'u
+Leave Bed=cliva lo ckana

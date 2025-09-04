@@ -1,0 +1,4 @@
+# textdomain: game_commands
+Kill yourself to respawn=Загинете, за да се преродите
+No static_spawnpoint defined=Не е зададена стойност на static_spawnpoint
+You need to be online to be killed!=Трябва да бъдете на линия за да загинете!
