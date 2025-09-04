@@ -1,5 +1,0 @@
-# textdomain: keys
-
-Key=
-Key to @1's @2=
-Skeleton Key=

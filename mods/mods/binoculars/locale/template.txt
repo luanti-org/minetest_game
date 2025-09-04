@@ -1,3 +1,0 @@
-# textdomain: binoculars
-Binoculars=
-Use with 'Zoom' key=

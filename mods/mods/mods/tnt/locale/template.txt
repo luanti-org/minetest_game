@@ -1,4 +1,0 @@
-# textdomain: tnt
-Gun Powder=
-TNT Stick=
-TNT=

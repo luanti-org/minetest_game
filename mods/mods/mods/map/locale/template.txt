@@ -1,3 +1,0 @@
-# textdomain: map
-Mapping Kit=
-Use with 'Minimap' key=
