@@ -38,8 +38,15 @@ local function destruct_bed(pos, n)
 	beds.remove_spawns_at(pos)
 end
 
+beds.is_bed_node = {}
+
+local function register_bed_node(name, def)
+	beds.is_bed_node[name] = true
+	core.register_node(name, def)
+end
+
 function beds.register_bed(name, def)
-	minetest.register_node(name .. "_bottom", {
+	register_bed_node(name .. "_bottom", {
 		description = def.description,
 		inventory_image = def.inventory_image,
 		wield_image = def.wield_image,
@@ -166,7 +173,7 @@ function beds.register_bed(name, def)
 		end,
 	})
 
-	minetest.register_node(name .. "_top", {
+	register_bed_node(name .. "_top", {
 		drawtype = "nodebox",
 		tiles = def.tiles.top,
 		use_texture_alpha = "clip",
