@@ -75,6 +75,7 @@ dofile(default_path.."/item_entity.lua")
 dofile(default_path.."/craftitems.lua")
 dofile(default_path.."/crafting.lua")
 dofile(default_path.."/mapgen.lua")
+dofile(default_path.."/chat.lua")
 dofile(default_path.."/aliases.lua")
 dofile(default_path.."/legacy.lua")
 
