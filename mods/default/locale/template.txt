@@ -213,5 +213,3 @@ Mese Sword=
 Diamond Sword=
 Torch=
 @1 will intersect protection on growth.=
-Minetest Game=
-A basic exploration, mining, crafting, and building, sandbox game with no NPCs, monsters, or animals. Minetest Game is usually used with mods added, and many mods are available for this game. Reliably maintained by Luanti core developers.=
