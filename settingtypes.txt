@@ -11,7 +11,8 @@ creative_mode (Creative mode) bool false
 #    cause severe destruction.
 #    Spreading fire nodes will disappear when fire is disabled, but
 #    'permanent_flame' nodes are unaffected.
-enable_fire (Fire) bool true
+#    If set to "auto", it will be enabled only in singleplayer.
+enable_fire (Fire) enum auto auto,true,false
 
 #    Enable flame sound.
 flame_sound (Flame sound) bool true
@@ -37,7 +38,8 @@ enable_fence_tall (Tall fences and walls) bool false
 
 #    When TNT explodes, it destroys nearby nodes and damages nearby players.
 #    This setting is disabled by default on servers.
-enable_tnt (TNT) bool true
+#    If set to "auto", it will be enabled only in singleplayer.
+enable_tnt (TNT) enum auto auto,true,false
 
 #    The radius in which nodes will be destroyed by a TNT explosion.
 tnt_radius (TNT radius) int 3 0

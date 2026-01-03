@@ -3,20 +3,17 @@
 -- Global namespace for functions
 fire = {}
 
--- Load support for MT game translation.
 local S = minetest.get_translator("fire")
 
--- 'Enable fire' setting
-local fire_enabled = minetest.settings:get_bool("enable_fire")
-if fire_enabled == nil then
-	-- enable_fire setting not specified, check for disable_fire
-	local fire_disabled = minetest.settings:get_bool("disable_fire")
-	if fire_disabled == nil then
-		-- Neither setting specified, check whether singleplayer
-		fire_enabled = minetest.is_singleplayer()
-	else
-		fire_enabled = not fire_disabled
+-- Default to enabled in singleplayer
+local fire_enabled = minetest.settings:get("enable_fire") or "auto"
+if fire_enabled == "auto" then
+	fire_enabled = minetest.is_singleplayer()
+	if minetest.settings:get_bool("disable_fire") then -- this is undocumented...?
+		fire_enabled = false
 	end
+else
+	fire_enabled = minetest.is_yes(fire_enabled)
 end
 
 --

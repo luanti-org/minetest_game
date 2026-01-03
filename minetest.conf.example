@@ -26,10 +26,12 @@
 # Inform player of condition and location of new bones.
 #bones_position_message = false
 
-# Whether fire should be enabled. If disabled, 'basic_flame' nodes will
-# disappear.
-# 'permanent_flame' nodes will remain with either setting.
-#enable_fire = true
+# Flammable nodes will be ignited by nearby igniters. Spreading fire may
+# cause severe destruction.
+# Spreading fire nodes will disappear when fire is disabled, but
+# 'permanent_flame' nodes are unaffected.
+# If set to "auto", it will be enabled only in singleplayer.
+#enable_fire = auto
 
 # Enable flame sound.
 #flame_sound = true
@@ -42,8 +44,10 @@
 #initial_stuff = default:pick_steel,default:axe_steel,default:shovel_steel,
 default:torch 99,default:cobble 99
 
-# Whether the TNT mod should be enabled.
-#enable_tnt = <true in singleplayer, false in multiplayer>
+# When TNT explodes, it destroys nearby nodes and damages nearby players.
+# This setting is disabled by default on servers.
+# If set to "auto", it will be enabled only in singleplayer.
+#enable_tnt = auto
 
 # The radius of a TNT explosion.
 #tnt_radius = 3
