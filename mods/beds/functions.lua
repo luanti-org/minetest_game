@@ -260,6 +260,7 @@ function beds.kick_player_at(kick_pos)
 					return false
 				end
 				lay_down(player, nil, nil, false)
+				core.close_formspec(name, "beds_form")
 				core.log("info", "[beds] Kicked "..name.." out of bed at "..core.pos_to_string(kick_pos))
 				return true
 			end
