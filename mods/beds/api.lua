@@ -36,6 +36,11 @@ local function destruct_bed(pos, n)
 		beds.remove_spawns_at(other)
 	end
 	beds.remove_spawns_at(pos)
+	if n == 1 then
+		beds.kick_player_at(pos)
+	elseif n == 2 and other then
+		beds.kick_player_at(other)
+	end
 end
 
 function beds.register_bed(name, def)
