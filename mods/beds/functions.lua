@@ -71,7 +71,7 @@ local function set_physics_override(player, put_to_bed)
 		if player_monoids then
 			for k, v in pairs(OVERRIDES) do
 				local monoid = player_monoids[k]
-				pdata["monoid_branch_" .. k] = monoid:get_active_branch(player)
+				pdata["monoid_branch_" .. k] = monoid:get_active_branch(player):get_name()
 				-- Change the "context" of the physics overrides
 				local branch = monoid:checkout_branch(player, IDENTIFIER)
 				branch:add_change(player, v)
