@@ -251,6 +251,24 @@ local function schedule_update()
 	end)
 end
 
+function beds.kick_player_at(kick_pos)
+	for name, bed_pos in pairs(beds.bed_position) do
+		if vector.equals(bed_pos, kick_pos) then
+			if beds.player[name] then
+				local player = core.get_player_by_name(name)
+				if not player then
+					return false
+				end
+				lay_down(player, nil, nil, false)
+				core.close_formspec(name, "beds_form")
+				core.log("info", "[beds] Kicked "..name.." out of bed at "..core.pos_to_string(kick_pos))
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function beds.on_rightclick(pos, player)
 	local name = player:get_player_name()
 	local ppos = player:get_pos()
