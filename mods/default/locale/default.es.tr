@@ -1,4 +1,5 @@
 # textdomain: default
+Can use /give and /giveme=
 Locked Chest=Cofre cerrado
 Locked Chest (owned by @1)=Cofre cerrado (propiedad de @1)
 You do not own this chest.=Este cofre no te pertenece.

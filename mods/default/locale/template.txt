@@ -1,4 +1,5 @@
 # textdomain: default
+Can use /give and /giveme=
 Locked Chest=
 Locked Chest (owned by @1)=
 You do not own this chest.=
