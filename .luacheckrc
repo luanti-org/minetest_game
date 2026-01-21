@@ -2,7 +2,7 @@ unused_args = false
 allow_defined_top = true
 
 globals = {
-	"default"
+	"default",
 }
 
 read_globals = {
@@ -33,3 +33,6 @@ files["mods/player_api/api.lua"].globals = { "minetest" }
 
 -- Don't report on legacy definitions of globals.
 files["mods/default/legacy.lua"].global = false
+
+-- Overwrites a description of a privilege
+files["mods/default/chat.lua"].globals = { "core.registered_privileges" }
