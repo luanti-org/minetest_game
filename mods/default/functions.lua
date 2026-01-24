@@ -18,7 +18,7 @@ function default.node_sound_stone_defaults(tbl)
 	tbl.footstep = tbl.footstep or
 			{name = "default_hard_footstep", gain = 0.2}
 	tbl.dug = tbl.dug or
-			{name = "default_hard_footstep", gain = 1.0}
+			{name = "default_dug_cracky", gain = 1.0}
 	default.node_sound_defaults(tbl)
 	return tbl
 end
