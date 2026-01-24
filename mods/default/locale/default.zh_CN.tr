@@ -1,4 +1,5 @@
 # textdomain: default
+Can use /give and /giveme=
 Locked Chest=已上锁的箱子
 Locked Chest (owned by @1)=已上锁的箱子（属于@1）
 You do not own this chest.=这个箱子不属于你所有。

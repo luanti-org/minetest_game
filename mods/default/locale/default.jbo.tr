@@ -1,4 +1,5 @@
 # textdomain: default
+Can use /give and /giveme=
 Locked Chest=lo selstela gairvau
 Locked Chest (owned by @1)=.i ti selstela gairvau po la'o zo'i.@1.zo'i
 You do not own this chest.=.i do na ponse lo ti gairvau
