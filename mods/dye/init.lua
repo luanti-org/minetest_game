@@ -56,13 +56,22 @@ minetest.register_craft({
 	},
 })
 
--- Manually add blueberries->violet dye
+-- Manually add blueberries -> violet dye
 
 minetest.register_craft({
 	output = "dye:violet 2",
 	recipe = {
 		{"default:blueberries"}
 	},
+})
+
+-- Manually add cooking cactus -> dark green dye
+
+minetest.register_craft({
+	type = "cooking",
+	output = "dye:dark_green",
+	recipe = "default:cactus",
+	cooktime = 5
 })
 
 -- Mix recipes
