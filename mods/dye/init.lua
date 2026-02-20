@@ -48,22 +48,32 @@ for _, row in ipairs(dye.dyes) do
 end
 
 -- Manually add coal -> black dye
-
 minetest.register_craft({
 	output = "dye:black 4",
 	recipe = {
 		{"group:coal"}
-	},
+	}
 })
 
--- Manually add blueberries->violet dye
+-- Add additional dye recipes if default found
+if minetest.get_modpath("default") then
 
-minetest.register_craft({
-	output = "dye:violet 2",
-	recipe = {
-		{"default:blueberries"}
-	},
-})
+	-- Manually add blueberries -> violet dye
+	minetest.register_craft({
+		output = "dye:violet 2",
+		recipe = {
+			{"default:blueberries"}
+		},
+	})
+
+	-- Manually add cooking cactus -> dark green dye
+	minetest.register_craft({
+		type = "cooking",
+		output = "dye:dark_green",
+		recipe = "default:cactus",
+		cooktime = 5
+	})
+end
 
 -- Mix recipes
 
