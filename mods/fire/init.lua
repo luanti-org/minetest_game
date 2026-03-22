@@ -163,6 +163,7 @@ local flame_sound = core.settings:get_bool("flame_sound", true)
 
 if flame_sound then
 	local handles = {}
+	local fading_out = {} -- tracks handles that are fading out, pending cleanup
 	local timer = 0
 
 	-- Parameters
@@ -189,13 +190,22 @@ if flame_sound then
 		end
 		-- Total number of flames in radius
 		local flames = #fpos
-		-- Stop previous sound
-		if handles[player_name] then
-			core.sound_stop(handles[player_name])
-			handles[player_name] = nil
+
+		-- Clean up any completed fade-outs from the previous cycle
+		if fading_out[player_name] then
+			core.sound_stop(fading_out[player_name])
+			fading_out[player_name] = nil
 		end
-		-- If flames present, find center of flame positions and play sound
-		if flames > 0 then
+
+		if handles[player_name] then
+			-- Sound already playing: fade out if player has left range
+			if flames == 0 then
+				core.sound_fade(handles[player_name], -0.5, 0.0)
+				fading_out[player_name] = handles[player_name]
+				handles[player_name] = nil
+			end
+		elseif flames > 0 then
+			-- Player has entered range: find center of flames and start sound
 			local fposmid
 			if #fpos == 1 then
 				fposmid = fpos[1]
@@ -208,7 +218,7 @@ if flame_sound then
 				end
 				fposmid = vector.divide(vector.add(fposmin, fposmax), 2)
 			end
-			-- Play sound, fading in to avoid abrupt restarts on each cycle
+			-- Fade in so the sound enters smoothly
 			local handle = core.sound_play(
 				{ name = "fire_fire", fade = 0.5 },
 				{
@@ -217,11 +227,8 @@ if flame_sound then
 					gain = math.min(0.06 * (1 + flames * 0.125), 0.18),
 					max_hear_distance = 32,
 					loop = true,
-					-- Start at a random offset so restarted sounds don't click
-					start_time = math.random() * cycle,
 				}
 			)
-			-- Store sound handle for this player
 			if handle then
 				handles[player_name] = handle
 			end
@@ -242,12 +249,16 @@ if flame_sound then
 		end
 	end)
 
-	-- Stop sound and clear handle on player leave
+	-- Stop sound and clear handles on player leave
 	core.register_on_leaveplayer(function(player)
 		local player_name = player:get_player_name()
 		if handles[player_name] then
 			core.sound_stop(handles[player_name])
 			handles[player_name] = nil
+		end
+		if fading_out[player_name] then
+			core.sound_stop(fading_out[player_name])
+			fading_out[player_name] = nil
 		end
 	end)
 end
