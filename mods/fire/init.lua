@@ -167,7 +167,7 @@ if flame_sound then
 
 	-- Parameters
 	local radius = 8 -- Flame node search radius around player
-	local cycle = 3 -- Cycle time for sound updates
+	local cycle = 1 -- Cycle time for sound updates
 
 	-- Update sound for player
 	function fire.update_player_sound(player)
