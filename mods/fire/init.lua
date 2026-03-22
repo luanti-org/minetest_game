@@ -220,14 +220,19 @@ if flame_sound then
 				end
 				fposmid = vector.divide(vector.add(fposmin, fposmax), 2)
 			end
-			-- Play sound
-			local handle = core.sound_play("fire_fire", {
-				pos = fposmid,
-				to_player = player_name,
-				gain = math.min(0.06 * (1 + flames * 0.125), 0.18),
-				max_hear_distance = 32,
-				loop = true -- In case of lag
-			})
+			-- Play sound, fading in to avoid abrupt restarts on each cycle
+			local handle = core.sound_play(
+				{ name = "fire_fire", fade = 0.5 },
+				{
+					pos = fposmid,
+					to_player = player_name,
+					gain = math.min(0.06 * (1 + flames * 0.125), 0.18),
+					max_hear_distance = 32,
+					loop = true,
+					-- Start at a random offset so restarted sounds don't click
+					start_time = math.random() * cycle,
+				}
+			)
 			-- Store sound handle for this player
 			if handle then
 				handles[player_name] = handle
