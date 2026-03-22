@@ -181,9 +181,14 @@ if flame_sound then
 			areamax,
 			{ "fire:basic_flame", "fire:permanent_flame" }
 		)
+		-- Filter to a spherical radius (find_nodes_in_area returns an AABB)
+		for i = #fpos, 1, -1 do
+			if vector.distance(ppos, fpos[i]) > radius then
+				table.remove(fpos, i)
+			end
+		end
 		-- Total number of flames in radius
-		local flames = (num["fire:basic_flame"] or 0) +
-			(num["fire:permanent_flame"] or 0)
+		local flames = #fpos
 		-- Stop previous sound
 		if handles[player_name] then
 			core.sound_stop(handles[player_name])
