@@ -194,34 +194,17 @@ if flame_sound then
 			core.sound_stop(handles[player_name])
 			handles[player_name] = nil
 		end
-		-- If flames
+		-- If flames present, find center of flame positions and play sound
 		if flames > 0 then
-			-- Find centre of flame positions
-			local fposmid = fpos[1]
-			-- If more than 1 flame
-			if #fpos > 1 then
-				local fposmin = areamax
-				local fposmax = areamin
+			local fposmid
+			if #fpos == 1 then
+				fposmid = fpos[1]
+			else
+				local fposmin = vector.copy(areamax)
+				local fposmax = vector.copy(areamin)
 				for i = 1, #fpos do
-					local fposi = fpos[i]
-					if fposi.x > fposmax.x then
-						fposmax.x = fposi.x
-					end
-					if fposi.y > fposmax.y then
-						fposmax.y = fposi.y
-					end
-					if fposi.z > fposmax.z then
-						fposmax.z = fposi.z
-					end
-					if fposi.x < fposmin.x then
-						fposmin.x = fposi.x
-					end
-					if fposi.y < fposmin.y then
-						fposmin.y = fposi.y
-					end
-					if fposi.z < fposmin.z then
-						fposmin.z = fposi.z
-					end
+					fposmin = vector.combine(fposmin, fpos[i], math.min)
+					fposmax = vector.combine(fposmax, fpos[i], math.max)
 				end
 				fposmid = vector.divide(vector.add(fposmin, fposmax), 2)
 			end
@@ -269,9 +252,6 @@ if flame_sound then
 	end)
 end
 
-
--- Deprecated function kept temporarily to avoid crashes if mod fire nodes call it
-function fire.update_sounds_around() end
 
 --
 -- ABMs
