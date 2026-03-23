@@ -275,17 +275,21 @@ function beds.on_rightclick(pos, player)
 	local tod = minetest.get_timeofday()
 
 	if tod > beds.day_interval.start and tod < beds.day_interval.finish then
+		beds.set_spawns(player, pos)
 		if beds.player[name] then
+			
 			lay_down(player, nil, nil, false)
 		end
 		minetest.chat_send_player(name, S("You can only sleep at night."))
+		minetest.chat_send_player(name, S("Spawn point set."))
 		return
 	end
 
 	-- move to bed
 	if not beds.player[name] then
 		lay_down(player, ppos, pos)
-		beds.set_spawns() -- save respawn positions when entering bed
+		
+		beds.set_spawns(player, pos) -- save respawn positions when entering bed
 	else
 		lay_down(player, nil, nil, false)
 	end
