@@ -177,7 +177,7 @@ if flame_sound then
 		local ppos = player:get_pos()
 		local areamin = vector.subtract(ppos, radius)
 		local areamax = vector.add(ppos, radius)
-		local fpos, num = core.find_nodes_in_area(
+		local fpos = core.find_nodes_in_area(
 			areamin,
 			areamax,
 			{ "fire:basic_flame", "fire:permanent_flame" }
