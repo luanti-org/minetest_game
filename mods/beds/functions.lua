@@ -275,20 +275,19 @@ function beds.on_rightclick(pos, player)
 	local tod = minetest.get_timeofday()
 
 	if tod > beds.day_interval.start and tod < beds.day_interval.finish then
-    if beds.player[name] then
-        lay_down(player, nil, nil, false)
-    end
+		if beds.player[name] then
+			lay_down(player, nil, nil, false)
+		end
+		local current_spawn = beds.spawn[name]
+		if not current_spawn or vector.distance(current_spawn, pos) > 0.1 then
+			beds.set_spawns(player, pos)
+			minetest.chat_send_player(name, S("Spawn point set."))
+		else
+			minetest.chat_send_player(name, S("You can only sleep at night."))
+		end
+		return
+	end
 
-    -- Only set spawn if not already set to this bed
-    local current_spawn = beds.spawn[name]
-    if not current_spawn or vector.distance(current_spawn, pos) > 0.1 then
-        beds.set_spawns(player, pos)
-        minetest.chat_send_player(name, S("Spawn point set."))
-    end
-
-    minetest.chat_send_player(name, S("You can only sleep at night."))
-    return
-end
 
 	-- move to bed
 	if not beds.player[name] then
