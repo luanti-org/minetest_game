@@ -52,7 +52,7 @@ end
 
 function beds.set_spawns(player, bed_pos)
     local name = player:get_player_name()
-    if not minetest.is_protected(bed_pos, name) then
+    if not core.is_protected(bed_pos, name) then
         beds.spawn[name] = bed_pos
         beds.save_spawns()
     end
