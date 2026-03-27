@@ -281,13 +281,12 @@ function beds.on_rightclick(pos, player)
 		local current_spawn = beds.spawn[name]
 		if not current_spawn or vector.distance(current_spawn, pos) > 0.1 then
 			beds.set_spawns(player, pos)
-			minetest.chat_send_player(name, S("Spawn point set."))
+			core.chat_send_player(name, S("Spawn point set."))
 		else
-			minetest.chat_send_player(name, S("You can only sleep at night."))
+			core.chat_send_player(name, S("You can only sleep at night."))
 		end
 		return
 	end
-
 
 	-- move to bed
 	if not beds.player[name] then
