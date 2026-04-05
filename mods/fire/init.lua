@@ -9,7 +9,7 @@ local S = core.get_translator("fire")
 local fire_enabled = core.settings:get("enable_fire") or "auto"
 if fire_enabled == "auto" then
 	fire_enabled = core.is_singleplayer()
-	if core.settings:get_bool("disable_fire") then -- this is undocumented...?
+	if core.settings:get_bool("disable_fire") then -- This is undocumented...?
 		fire_enabled = false
 	end
 else
@@ -25,7 +25,7 @@ local function flood_flame(pos, _, newnode)
 	-- Play flame extinguish sound if liquid is not an 'igniter'
 	if core.get_item_group(newnode.name, "igniter") == 0 then
 		core.sound_play("fire_extinguish_flame",
-			{ pos = pos, max_hear_distance = 16, gain = 0.15 }, true)
+				{ pos = pos, max_hear_distance = 16, gain = 0.15 }, true)
 	end
 	-- Remove the flame
 	return false
@@ -89,7 +89,7 @@ core.register_tool("fire:flint_and_steel", {
 	on_use = function(itemstack, user, pointed_thing)
 		local sound_pos = pointed_thing.above or user:get_pos()
 		core.sound_play("fire_flint_and_steel",
-			{ pos = sound_pos, gain = 0.2, max_hear_distance = 8 }, true)
+				{ pos = sound_pos, gain = 0.2, max_hear_distance = 8 }, true)
 		local player_name = user:get_player_name()
 		if pointed_thing.type == "node" then
 			local node_under = core.get_node(pointed_thing.under).name
@@ -104,7 +104,7 @@ core.register_tool("fire:flint_and_steel", {
 			if nodedef.on_ignite then
 				nodedef.on_ignite(pointed_thing.under, user)
 			elseif core.get_item_group(node_under, "flammable") >= 1
-				and core.get_node(pointed_thing.above).name == "air" then
+					and core.get_node(pointed_thing.above).name == "air" then
 				if core.is_protected(pointed_thing.above, player_name) then
 					core.record_protection_violation(pointed_thing.above, player_name)
 					return
@@ -121,7 +121,7 @@ core.register_tool("fire:flint_and_steel", {
 			-- Tool break sound
 			if itemstack:get_count() == 0 and wdef.sound and wdef.sound.breaks then
 				core.sound_play(wdef.sound.breaks,
-					{ pos = sound_pos, gain = 0.5 }, true)
+						{ pos = sound_pos, gain = 0.5 }, true)
 			end
 			return itemstack
 		end
@@ -162,7 +162,7 @@ local flame_sound = core.settings:get_bool("flame_sound", true)
 
 if flame_sound then
 	local handles = {}
-	local fading_out = {} -- tracks handles that are fading out, pending cleanup
+	local fading_out = {} -- Tracks handles that are fading out, pending cleanup
 	local timer = 0
 
 	-- Parameters
