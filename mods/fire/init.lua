@@ -34,7 +34,7 @@ end
 -- Flame nodes
 local fire_node = {
 	drawtype = "firelike",
-	tiles = { {
+	tiles = {{
 		name = "fire_basic_flame_animated.png",
 		animation = {
 			type = "vertical_frames",
@@ -42,8 +42,7 @@ local fire_node = {
 			aspect_h = 16,
 			length = 1
 		}
-	}
-	},
+	}},
 	inventory_image = "fire_basic_flame.png",
 	paramtype = "light",
 	light_source = 13,
