@@ -209,7 +209,7 @@ local function is_all_empty(player_inv)
 	return true
 end
 
-minetest.register_on_dieplayer(function(player)
+core.register_on_dieplayer(function(player)
 	local bones_mode = core.settings:get("bones_mode") or "bones"
 	if bones_mode ~= "bones" and bones_mode ~= "drop" and bones_mode ~= "keep" then
 		bones_mode = "bones"
