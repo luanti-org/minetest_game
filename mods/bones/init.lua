@@ -210,7 +210,7 @@ local function is_all_empty(player_inv)
 end
 
 core.register_on_dieplayer(function(player)
-	local bones_mode = core.settings:get("bones_mode") or "bones"
+	local bones_mode = core.settings:get("bones_mode")
 	if bones_mode ~= "bones" and bones_mode ~= "drop" and bones_mode ~= "keep" then
 		bones_mode = "bones"
 	end
@@ -219,35 +219,20 @@ core.register_on_dieplayer(function(player)
 	local player_name = player:get_player_name()
 	local pos = vector.round(player:get_pos())
 	local pos_string = core.pos_to_string(pos)
-
-	-- return if keep inventory set or in creative mode
-	if bones_mode == "keep" or core.is_creative_enabled(player_name) then
-		core.log("action", player_name .. " dies at " .. pos_string ..
-			". No bones placed")
-		if bones_position_message then
-			core.chat_send_player(player_name, S("@1 died at @2.", player_name, pos_string))
-		end
-		return
-	end
-
 	local player_inv = player:get_inventory()
-	if is_all_empty(player_inv) then
-		core.log("action", player_name .. " dies at " .. pos_string ..
-			". No bones placed")
+
+	-- message helper function
+	local function notify(log_msg, chat_msg)
+		core.log("action", player_name .. " dies at " .. pos_string .. ". " .. log_msg)
 		if bones_position_message then
-			core.chat_send_player(player_name, S("@1 died at @2.", player_name, pos_string))
+			core.chat_send_player(player_name, chat_msg)
 		end
-		return
 	end
 
-	-- check if it's possible to place bones, if not find space near player
-	if bones_mode == "bones" and not may_replace(pos, player) then
-		local air = core.find_node_near(pos, 1, {"air"})
-		if air then
-			pos = air
-		else
-			bones_mode = "drop"
-		end
+	-- return if keep inventory set or in creative mode or empty inventory
+	if bones_mode == "keep" or core.is_creative_enabled(player_name) or is_all_empty(player_inv) then
+		notify("No bones placed", S("@1 died at @2.", player_name, pos_string))
+		return
 	end
 
 	-- check if it's possible to place bones, if not find space near player
@@ -286,17 +271,11 @@ core.register_on_dieplayer(function(player)
 		else
 			meta:set_string("infotext", S("@1's bones", player_name))
 		end
-		core.log("action", player_name .. " dies at " .. pos_string .. ". Bones placed")
-		if bones_position_message then
-			core.chat_send_player(player_name, S("@1 died at @2, and bones were placed.",
+		notify("Bones placed", S("@1 died at @2, and bones were placed.",
 				player_name, pos_string))
-		end
 	else
-		core.log("action", player_name .. " dies at " .. pos_string .. ". Inventory dropped")
-		if bones_position_message then
-			core.chat_send_player(player_name,
-					S("@1 died at @2, and dropped their inventory.", player_name, pos_string))
-		end
+		notify("Inventory dropped", S("@1 died at @2, and dropped their inventory.",
+				player_name, pos_string))
 	end
 
 	-- loop through player inventories and place items inside bones or drop
