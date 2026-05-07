@@ -250,68 +250,68 @@ core.register_on_dieplayer(function(player)
 		end
 	end
 
-	if bones_mode == "drop" then
-		for _, list_name in ipairs(player_inventory_lists) do
-			for i = 1, player_inv:get_size(list_name) do
-				local stack = player_inv:get_stack(list_name, i)
-				if stack:get_count() > 0 and
-						core.get_item_group(stack:get_name(), "soulbound") == 0 then
-					drop(pos, player_inv:get_stack(list_name, i))
-					player_inv:set_stack(list_name, i, nil)
-				end
+	-- check if it's possible to place bones, if not find space near player
+	if bones_mode == "bones" and not may_replace(pos, player) then
+		local air = core.find_node_near(pos, 1, {"air"})
+		if air then
+			pos = air
+		else
+			bones_mode = "drop"
+		end
+	end
+
+	local inv, meta
+
+	-- place bones and set inventory/timer
+	if bones_mode == "bones" then
+		local param2 = core.dir_to_facedir(player:get_look_dir())
+		core.set_node(pos, {name = "bones:bones", param2 = param2})
+
+		meta = core.get_meta(pos)
+		inv = meta:get_inventory()
+		inv:set_size("main", 8 * 4)
+		meta:set_string("formspec", bones_formspec)
+		meta:set_string("owner", player_name)
+
+		if share_bones_time ~= 0 then
+			meta:set_string("infotext", S("@1's fresh bones", player_name))
+
+			if share_bones_time_early == 0 or not core.is_protected(pos, player_name) then
+				meta:set_int("time", 0)
+			else
+				meta:set_int("time", (share_bones_time - share_bones_time_early))
 			end
+
+			core.get_node_timer(pos):start(10)
+		else
+			meta:set_string("infotext", S("@1's bones", player_name))
 		end
-		drop(pos, ItemStack("bones:bones"))
-		core.log("action", player_name .. " dies at " .. pos_string ..
-			". Inventory dropped")
+		core.log("action", player_name .. " dies at " .. pos_string .. ". Bones placed")
 		if bones_position_message then
-			core.chat_send_player(player_name, S("@1 died at @2, and dropped their inventory.", player_name, pos_string))
+			core.chat_send_player(player_name, S("@1 died at @2, and bones were placed.",
+				player_name, pos_string))
 		end
-		return
+	else
+		core.log("action", player_name .. " dies at " .. pos_string .. ". Inventory dropped")
+		if bones_position_message then
+			core.chat_send_player(player_name,
+					S("@1 died at @2, and dropped their inventory.", player_name, pos_string))
+		end
 	end
 
-	local param2 = core.dir_to_facedir(player:get_look_dir())
-	core.set_node(pos, {name = "bones:bones", param2 = param2})
-
-	core.log("action", player_name .. " dies at " .. pos_string ..
-		". Bones placed")
-	if bones_position_message then
-		core.chat_send_player(player_name, S("@1 died at @2, and bones were placed.", player_name, pos_string))
-	end
-
-	local meta = core.get_meta(pos)
-	local inv = meta:get_inventory()
-	inv:set_size("main", 8 * 4)
-
+	-- loop through player inventories and place items inside bones or drop
 	for _, list_name in ipairs(player_inventory_lists) do
 		for i = 1, player_inv:get_size(list_name) do
 			local stack = player_inv:get_stack(list_name, i)
 			if stack:get_count() > 0 and
-						core.get_item_group(stack:get_name(), "soulbound") == 0 then
-				if inv:room_for_item("main", stack) then
+					core.get_item_group(stack:get_name(), "soulbound") == 0 then
+				if bones_mode == "bones" and inv:room_for_item("main", stack) then
 					inv:add_item("main", stack)
-				else -- no space left
+				else -- no space left or bones_mode set to drop
 					drop(pos, stack)
 				end
 				player_inv:set_stack(list_name, i, nil)
 			end
 		end
-	end
-
-	meta:set_string("formspec", bones_formspec)
-	meta:set_string("owner", player_name)
-
-	if share_bones_time ~= 0 then
-		meta:set_string("infotext", S("@1's fresh bones", player_name))
-
-		if share_bones_time_early == 0 or not core.is_protected(pos, player_name) then
-			meta:set_int("time", 0)
-		else
-			meta:set_int("time", (share_bones_time - share_bones_time_early))
-		end
-
-		core.get_node_timer(pos):start(10)
-	else
-		meta:set_string("infotext", S("@1's bones", player_name))
 	end
 end)
