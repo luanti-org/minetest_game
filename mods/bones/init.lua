@@ -284,7 +284,7 @@ core.register_on_dieplayer(function(player)
 			local stack = player_inv:get_stack(list_name, i)
 			if stack:get_count() > 0 and
 					core.get_item_group(stack:get_name(), "soulbound") == 0 then
-				if bones_mode == "bones" and inv:room_for_item("main", stack) then
+				if bones_mode == "bones" and inv and inv:room_for_item("main", stack) then
 					inv:add_item("main", stack)
 				else -- no space left or bones_mode set to drop
 					drop(pos, stack)
