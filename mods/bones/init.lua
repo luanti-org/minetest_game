@@ -167,23 +167,18 @@ local function may_replace(pos, player)
 	local node_definition = core.registered_nodes[node_name]
 
 	-- if the node is unknown, we return false
-	if not node_definition then
+	if not node_definition or node_name == "ignore" then
 		return false
 	end
 
-	-- allow replacing air
-	if node_name == "air" then
+	-- allow replacing air or flowing liquid
+	if node_name == "air" or node_definition.liquidtype == "flowing" then
 		return true
 	end
 
 	-- don't replace nodes inside protections
 	if core.is_protected(pos, player:get_player_name()) then
 		return false
-	end
-
-	-- allow replacing liquids
-	if node_definition.liquidtype ~= "none" then
-		return true
 	end
 
 	-- don't replace filled chests and other nodes that don't allow it
