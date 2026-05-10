@@ -85,6 +85,8 @@ in `bones.player_inventory_lists`.
 
 e.g. `table.insert(bones.player_inventory_lists, "backpack")`
 
+Items with the group `soulbound = 1` will not be moved out of the inventory on death.
+
 
 Creative API
 ------------
