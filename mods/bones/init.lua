@@ -282,7 +282,7 @@ core.register_on_dieplayer(function(player)
 	for _, list_name in ipairs(player_inventory_lists) do
 		for i = 1, player_inv:get_size(list_name) do
 			local stack = player_inv:get_stack(list_name, i)
-			if stack:get_count() > 0 and
+			if not stack:is_empty() and
 					core.get_item_group(stack:get_name(), "soulbound") == 0 then
 				if bones_mode == "bones" and inv and inv:room_for_item("main", stack) then
 					inv:add_item("main", stack)
