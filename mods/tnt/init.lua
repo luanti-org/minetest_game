@@ -250,7 +250,7 @@ local function add_effects(pos, radius, drops)
 			most = count
 			local def = core.registered_nodes[name]
 			if def then
-				node = { name = name }
+				node = {name = name}
 				if def.tiles and type(def.tiles[1]) == "string" then
 					texture = def.tiles[1]
 				end
@@ -287,12 +287,12 @@ function tnt.burn(pos, nodename)
 		def.on_ignite(pos)
 	elseif core.get_item_group(name, "tnt") > 0 then
 		core.swap_node(pos, {name = name .. "_burning"})
-		core.sound_play("tnt_ignite", {pos = pos, gain = 1.0}, true)
+		core.sound_play("tnt_ignite", {pos = pos}, true)
 		core.get_node_timer(pos):start(1)
 	end
 end
 
-local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owner, explode_center)
+local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owner)
 	pos = vector.round(pos)
 	-- scan for adjacent TNT nodes first, and enlarge the explosion
 	local vm1 = VoxelManip()
@@ -302,28 +302,24 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	local a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
 	local data = vm1:get_data()
 	local count = 0
-	local c_tnt
 	local c_tnt_burning = core.get_content_id("tnt:tnt_burning")
+	local c_tnt = enable_tnt and core.get_content_id("tnt:tnt") or c_tnt_burning
 	local c_tnt_boom = core.get_content_id("tnt:boom")
 	local c_air = core.CONTENT_AIR
 	local c_ignore = core.CONTENT_IGNORE
-	if enable_tnt then
-		c_tnt = core.get_content_id("tnt:tnt")
-	else
-		c_tnt = c_tnt_burning -- tnt is not registered if disabled
-	end
-	-- make sure we still have explosion even when centre node isnt tnt related
-	if explode_center then
-		count = 1
-	end
+
+	-- Regardless of center node, always start with a boom
+	local count = 1
 
 	for z = pos.z - 2, pos.z + 2 do
 	for y = pos.y - 2, pos.y + 2 do
 		local vi = a:index(pos.x - 2, y, z)
 		for x = pos.x - 2, pos.x + 2 do
 			local cid = data[vi]
-			if cid == c_tnt or cid == c_tnt_boom or cid == c_tnt_burning then
+			if cid == c_tnt or cid == c_tnt_burning then
 				count = count + 1
+				data[vi] = c_air
+			elseif cid == c_tnt_boom then
 				data[vi] = c_air
 			end
 			vi = vi + 1
@@ -443,7 +439,7 @@ function tnt.boom(pos, def)
 	core.sound_play(sound, {pos = pos, gain = 2.5,
 			max_hear_distance = math.min(def.radius * 20, 128)}, true)
 	local drops, radius = tnt_explode(pos, def.radius, def.ignore_protection,
-			def.ignore_on_blast, owner, def.explode_center)
+			def.ignore_on_blast, owner)
 	-- append entity drops
 	local damage_radius = (radius / math.max(1, def.radius)) * def.damage_radius
 	entity_physics(pos, damage_radius, drops)
@@ -580,8 +576,7 @@ core.register_node("tnt:gunpowder_burning", {
 	-- unaffected by explosions
 	on_blast = function() end,
 	on_construct = function(pos)
-		core.sound_play("tnt_gunpowder_burning", {pos = pos,
-			gain = 1.0}, true)
+		core.sound_play("tnt_gunpowder_burning", {pos = pos}, true)
 		core.get_node_timer(pos):start(1)
 	end,
 })
