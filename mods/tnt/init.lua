@@ -303,7 +303,6 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	local data = vm1:get_data()
 	local c_tnt_burning = core.get_content_id("tnt:tnt_burning")
 	local c_tnt = enable_tnt and core.get_content_id("tnt:tnt") or c_tnt_burning
-	local c_tnt_boom = core.get_content_id("tnt:boom")
 	local c_air = core.CONTENT_AIR
 	local c_ignore = core.CONTENT_IGNORE
 
