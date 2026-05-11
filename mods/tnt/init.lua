@@ -301,7 +301,6 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	local minp, maxp = vm1:read_from_map(p1, p2)
 	local a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
 	local data = vm1:get_data()
-	local count = 0
 	local c_tnt_burning = core.get_content_id("tnt:tnt_burning")
 	local c_tnt = enable_tnt and core.get_content_id("tnt:tnt") or c_tnt_burning
 	local c_tnt_boom = core.get_content_id("tnt:boom")
