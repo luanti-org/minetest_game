@@ -427,16 +427,16 @@ function tnt.boom(pos, def)
 	def = def or {}
 	def.radius = def.radius or 1
 	def.damage_radius = def.damage_radius or def.radius * 2
+	def.sound = def.sound or "tnt_explode"
 	local meta = core.get_meta(pos)
 	local owner = meta:get_string("owner")
 	if not def.explode_center and def.ignore_protection ~= true then
 		core.set_node(pos, {name = "tnt:boom"})
 	end
-	local sound = def.sound or "tnt_explode"
-	core.sound_play(sound, {pos = pos, gain = 2.5,
+	core.sound_play(def.sound, {pos = pos, gain = 2.5,
 			max_hear_distance = math.min(def.radius * 20, 128)}, true)
 	local drops, radius = tnt_explode(pos, def.radius, def.ignore_protection,
-			def.ignore_on_blast, owner, def.explode_center)
+			def.ignore_on_blast, owner)
 	-- append entity drops
 	local damage_radius = (radius / math.max(1, def.radius)) * def.damage_radius
 	entity_physics(pos, damage_radius, drops)
