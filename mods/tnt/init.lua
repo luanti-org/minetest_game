@@ -430,11 +430,9 @@ function tnt.boom(pos, def)
 end
 
 core.register_node("tnt:boom", {
-	drawtype = "plantlike",
+	drawtype = "airlike",
 	inventory_image = "tnt_boom.png",
 	wield_image = "tnt_boom.png",
-	tiles = {"tnt_boom.png"},
-	visual_scale = 2,
 	light_source = default.LIGHT_MAX,
 	walkable = false,
 	drop = "",
