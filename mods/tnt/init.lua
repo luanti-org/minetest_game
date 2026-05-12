@@ -303,7 +303,6 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	local data = vm1:get_data()
 	local c_tnt_burning = core.get_content_id("tnt:tnt_burning")
 	local c_tnt = enable_tnt and core.get_content_id("tnt:tnt") or c_tnt_burning
-	local c_tnt_boom = core.get_content_id("tnt:boom")
 	local c_air = core.CONTENT_AIR
 	local c_ignore = core.CONTENT_IGNORE
 
@@ -317,8 +316,6 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 			local cid = data[vi]
 			if cid == c_tnt or cid == c_tnt_burning then
 				count = count + 1
-				data[vi] = c_air
-			elseif cid == c_tnt_boom then
 				data[vi] = c_air
 			end
 			vi = vi + 1
@@ -429,13 +426,13 @@ function tnt.boom(pos, def)
 	def = def or {}
 	def.radius = def.radius or 1
 	def.damage_radius = def.damage_radius or def.radius * 2
+	def.sound = def.sound or "tnt_explode"
 	local meta = core.get_meta(pos)
 	local owner = meta:get_string("owner")
 	if not def.explode_center and def.ignore_protection ~= true then
 		core.set_node(pos, {name = "tnt:boom"})
 	end
-	local sound = def.sound or "tnt_explode"
-	core.sound_play(sound, {pos = pos, gain = 2.5,
+	core.sound_play(def.sound, {pos = pos, gain = 2.5,
 			max_hear_distance = math.min(def.radius * 20, 128)}, true)
 	local drops, radius = tnt_explode(pos, def.radius, def.ignore_protection,
 			def.ignore_on_blast, owner)
@@ -451,13 +448,22 @@ function tnt.boom(pos, def)
 end
 
 core.register_node("tnt:boom", {
-	drawtype = "airlike",
+	drawtype = "plantlike",
 	inventory_image = "tnt_boom.png",
 	wield_image = "tnt_boom.png",
+	tiles = {"tnt_boom.png"},
+	visual_scale = 2,
 	light_source = default.LIGHT_MAX,
 	walkable = false,
 	drop = "",
 	groups = {dig_immediate = 3, not_in_creative_inventory = 1},
+	-- add a slight pause before removal to illuminate explosion
+	on_construct = function(pos)
+		core.get_node_timer(pos):start(0.4)
+	end,
+	on_timer = function(pos, elapsed)
+		core.remove_node(pos)
+	end,
 	-- unaffected by explosions
 	on_blast = function() end,
 })
