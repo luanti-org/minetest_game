@@ -292,7 +292,7 @@ function tnt.burn(pos, nodename)
 	end
 end
 
-local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owner, explode_center)
+local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owner)
 	pos = vector.round(pos)
 	-- scan for adjacent TNT nodes first, and enlarge the explosion
 	local vm1 = VoxelManip()
@@ -301,23 +301,19 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	local minp, maxp = vm1:read_from_map(p1, p2)
 	local a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
 	local data = vm1:get_data()
-	local count = 0
 	local c_tnt_burning = core.get_content_id("tnt:tnt_burning")
 	local c_tnt = enable_tnt and core.get_content_id("tnt:tnt") or c_tnt_burning
-	local c_tnt_boom = core.get_content_id("tnt:boom")
 	local c_air = core.CONTENT_AIR
 	local c_ignore = core.CONTENT_IGNORE
-	-- make sure we still have explosion even when centre node isnt tnt related
-	if explode_center then
-		count = 1
-	end
+	-- Regardless of center node, always start with a boom
+	local count = 1
 
 	for z = pos.z - 2, pos.z + 2 do
 	for y = pos.y - 2, pos.y + 2 do
 		local vi = a:index(pos.x - 2, y, z)
 		for x = pos.x - 2, pos.x + 2 do
 			local cid = data[vi]
-			if cid == c_tnt or cid == c_tnt_boom or cid == c_tnt_burning then
+			if cid == c_tnt or cid == c_tnt_burning then
 				count = count + 1
 				data[vi] = c_air
 			end
@@ -438,7 +434,7 @@ function tnt.boom(pos, def)
 	core.sound_play(def.sound, {pos = pos, gain = 2.5,
 			max_hear_distance = math.min(def.radius * 20, 128)}, true)
 	local drops, radius = tnt_explode(pos, def.radius, def.ignore_protection,
-			def.ignore_on_blast, owner, def.explode_center)
+			def.ignore_on_blast, owner)
 	-- append entity drops
 	local damage_radius = (radius / math.max(1, def.radius)) * def.damage_radius
 	entity_physics(pos, damage_radius, drops)
@@ -458,6 +454,13 @@ core.register_node("tnt:boom", {
 	walkable = false,
 	drop = "",
 	groups = {dig_immediate = 3, not_in_creative_inventory = 1},
+	-- add a slight pause before removal to illuminate explosion
+	on_construct = function(pos)
+		core.get_node_timer(pos):start(0.4)
+	end,
+	on_timer = function(pos, elapsed)
+		core.remove_node(pos)
+	end,
 	-- unaffected by explosions
 	on_blast = function() end,
 })
