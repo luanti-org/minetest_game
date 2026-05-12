@@ -36,41 +36,23 @@ local function particle_texture(name)
 	return ret
 end
 
-local function rand_pos(center, pos, radius)
-	local def
-	local reg_nodes = core.registered_nodes
-	local i = 0
-	repeat
-		-- Give up and use the center if this takes too long
-		if i > 4 then
-			pos.x, pos.z = center.x, center.z
-			break
-		end
-		pos.x = center.x + math.random(-radius, radius)
-		pos.z = center.z + math.random(-radius, radius)
-		def = reg_nodes[core.get_node(pos).name]
-		i = i + 1
-	until def and not def.walkable
-end
-
 local function eject_drops(drops, pos, radius)
-	local drop_pos = vector.new(pos)
 	for _, item in pairs(drops) do
 		local count = math.min(item:get_count(), item:get_stack_max())
 		while count > 0 do
 			local take = math.max(1, math.min(radius * radius,
 					count,
 					item:get_stack_max()))
-			rand_pos(pos, drop_pos, radius)
 			local dropitem = ItemStack(item)
 			dropitem:set_count(take)
-			local obj = core.add_item(drop_pos, dropitem)
+			local obj = core.add_item(pos, dropitem)
 			if obj then
 				obj:get_luaentity().collect = true
 				obj:set_acceleration({x = 0, y = -10, z = 0})
-				obj:set_velocity({x = math.random(-3, 3),
+				obj:set_velocity({
+						x = math.random(-radius, radius),
 						y = math.random(0, 10),
-						z = math.random(-3, 3)})
+						z = math.random(-radius, radius)})
 			end
 			count = count - take
 		end
