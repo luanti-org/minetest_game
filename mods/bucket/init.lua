@@ -136,7 +136,7 @@ core.register_craftitem("bucket:bucket_empty", {
 		local pos = pointed_thing.under
 		local node = core.get_node(pos)
 		local liquiddef = bucket.liquids[node.name]
-	
+
 		if not liquiddef or not liquiddef.itemname
 		or node.name ~= liquiddef.source then
 			-- non-liquid nodes will have their on_punch triggered
@@ -146,7 +146,7 @@ core.register_craftitem("bucket:bucket_empty", {
 			end
 			return wielded
 		end
-		
+
 		local pname = user:get_player_name()
 		if check_protection(pos, pname, "take " .. node.name) then
 			return
