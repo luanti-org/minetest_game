@@ -124,9 +124,10 @@ core.register_craftitem("bucket:bucket_empty", {
 	groups = {tool = 1},
 	liquids_pointable = true,
 	on_use = function(itemstack, user, pointed_thing)
+		local wielded = user:get_wielded_item()
 		if pointed_thing.type == "object" then
 			pointed_thing.ref:punch(user, 1.0, {full_punch_interval = 1.0}, nil)
-			return user:get_wielded_item()
+			return wielded
 		elseif pointed_thing.type ~= "node" then
 			-- do nothing if it's neither object nor node
 			return
@@ -135,57 +136,52 @@ core.register_craftitem("bucket:bucket_empty", {
 		local pos = pointed_thing.under
 		local node = core.get_node(pos)
 		local liquiddef = bucket.liquids[node.name]
-		local item_count = user:get_wielded_item():get_count()
-
-		if liquiddef ~= nil
-		and liquiddef.itemname ~= nil
-		and node.name == liquiddef.source then
-			local pname = user:get_player_name()
-			if check_protection(pos, pname, "take ".. node.name) then
-				return
-			end
-
-			-- default set to return filled bucket
-			local giving_back = liquiddef.itemname
-
-			-- check if holding more than 1 empty bucket
-			if item_count > 1 then
-
-				-- if space in inventory add filled bucked, otherwise drop as item
-				local inv = user:get_inventory()
-				if inv:room_for_item("main", {name = liquiddef.itemname}) then
-					inv:add_item("main", liquiddef.itemname)
-				else
-					local upos = user:get_pos()
-					upos.y = math.floor(upos.y + 0.5)
-					core.add_item(upos, liquiddef.itemname)
-				end
-
-				-- set to return empty buckets minus 1
-				giving_back = "bucket:bucket_empty " .. tostring(item_count - 1)
-			end
-
-			-- force_renew requires a source neighbour
-			local source_neighbor = false
-			if liquiddef.force_renew then
-				source_neighbor = core.find_node_near(pos, 1, liquiddef.source)
-			end
-			if source_neighbor and liquiddef.force_renew then
-				log_action(pos, pname, "picked up " .. liquiddef.source .. " (force renewed)")
-			else
-				core.remove_node(pos)
-				log_action(pos, pname, "picked up " .. liquiddef.source)
-			end
-
-			return ItemStack(giving_back)
-		else
+	
+		if not liquiddef or not liquiddef.itemname
+		or node.name ~= liquiddef.source then
 			-- non-liquid nodes will have their on_punch triggered
 			local node_def = core.registered_nodes[node.name]
 			if node_def then
 				node_def.on_punch(pos, node, user, pointed_thing)
 			end
-			return user:get_wielded_item()
+			return wielded
 		end
+		
+		local pname = user:get_player_name()
+		if check_protection(pos, pname, "take " .. node.name) then
+			return
+		end
+
+		-- default set to return filled bucket
+		local giving_back = liquiddef.itemname
+
+		-- check if holding more than 1 empty bucket
+		local item_count = wielded:get_count()
+		if item_count > 1 then
+
+			-- if space in inventory add filled bucked, otherwise drop as item
+			local inv = user:get_inventory()
+			if inv and inv:room_for_item("main", liquiddef.itemname) then
+				inv:add_item("main", liquiddef.itemname)
+			else
+				local upos = user:get_pos()
+				upos.y = math.floor(upos.y + 0.5)
+				core.add_item(upos, liquiddef.itemname)
+			end
+
+			-- set to return empty buckets minus 1
+			giving_back = "bucket:bucket_empty " .. tostring(item_count - 1)
+		end
+
+		-- force_renew requires a source neighbour
+		if liquiddef.force_renew and core.find_node_near(pos, 1, liquiddef.source) then
+			log_action(pos, pname, "picked up " .. liquiddef.source .. " (force renewed)")
+		else
+			core.remove_node(pos)
+			log_action(pos, pname, "picked up " .. liquiddef.source)
+		end
+
+		return ItemStack(giving_back)
 	end
 })
 
