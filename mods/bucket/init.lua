@@ -59,63 +59,61 @@ function bucket.register_liquid(source, flowing, itemname, inventory_image, name
 	}
 	bucket.liquids[flowing] = bucket.liquids[source]
 
-	if itemname ~= nil then
-		core.register_craftitem(itemname_raw, {
-			description = name,
-			inventory_image = inventory_image,
-			stack_max = 1,
-			liquids_pointable = true,
-			groups = groups,
-
-			on_place = function(itemstack, user, pointed_thing)
-				-- Must be pointing to node
-				if pointed_thing.type ~= "node" then
-					return
-				end
-
-				local node = core.get_node_or_nil(pointed_thing.under)
-				local ndef = node and core.registered_nodes[node.name]
-
-				-- Call on_rightclick if the pointed node defines it
-				if ndef and ndef.on_rightclick and
-						not (user and user:is_player() and
-						user:get_player_control().sneak) then
-					return ndef.on_rightclick(
-						pointed_thing.under,
-						node, user,
-						itemstack)
-				end
-
-				local lpos
-
-				-- Check if pointing to a buildable node
-				if ndef and ndef.buildable_to then
-					-- buildable; replace the node
-					lpos = pointed_thing.under
-				else
-					-- not buildable to; place the liquid above
-					-- check if the node above can be replaced
-					lpos = pointed_thing.above
-					node = core.get_node_or_nil(lpos)
-					local above_ndef = node and core.registered_nodes[node.name]
-
-					if not above_ndef or not above_ndef.buildable_to then
-						-- do not remove the bucket with the liquid
-						return itemstack
-					end
-				end
-
-				local pname = user and user:get_player_name() or ""
-				if check_protection(lpos, pname, "place " .. source) then
-					return
-				end
-
-				core.set_node(lpos, {name = source})
-				log_action(lpos, pname, "placed " .. source)
-				return ItemStack("bucket:bucket_empty")
-			end
-		})
+	if not itemname then
+		return
 	end
+
+	core.register_craftitem(itemname_raw, {
+		description = name,
+		inventory_image = inventory_image,
+		stack_max = 1,
+		liquids_pointable = true,
+		groups = groups,
+
+		on_place = function(itemstack, user, pointed_thing)
+			-- Must be pointing to node
+			if pointed_thing.type ~= "node" then
+				return
+			end
+
+			local node = core.get_node_or_nil(pointed_thing.under)
+			local ndef = node and core.registered_nodes[node.name]
+
+			-- Call on_rightclick if the pointed node defines it
+			if ndef and ndef.on_rightclick and
+					not (user and user:is_player() and
+					user:get_player_control().sneak) then
+				return ndef.on_rightclick(
+					pointed_thing.under,
+					node, user,
+					itemstack)
+			end
+
+			local lpos = pointed_thing.under
+
+			-- Check if node is not buildable_to
+			if not ndef or not ndef.buildable_to then
+				-- if node above can be replaced, place the liquid above
+				lpos = pointed_thing.above
+				node = core.get_node_or_nil(lpos)
+				local above_ndef = node and core.registered_nodes[node.name]
+
+				if not above_ndef or not above_ndef.buildable_to then
+					-- do not remove the bucket with the liquid
+					return itemstack
+				end
+			end
+
+			local pname = user and user:get_player_name() or ""
+			if check_protection(lpos, pname, "place " .. source) then
+				return
+			end
+
+			core.set_node(lpos, {name = source})
+			log_action(lpos, pname, "placed " .. source)
+			return ItemStack("bucket:bucket_empty")
+		end
+	})
 end
 
 core.register_craftitem("bucket:bucket_empty", {
