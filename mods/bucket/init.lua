@@ -136,7 +136,7 @@ core.register_craftitem("bucket:bucket_empty", {
 		local liquiddef = bucket.liquids[node.name]
 
 		if not liquiddef or not liquiddef.itemname
-		or node.name ~= liquiddef.source then
+				or node.name ~= liquiddef.source then
 			-- non-liquid nodes will have their on_punch triggered
 			local node_def = core.registered_nodes[node.name]
 			if node_def then
@@ -159,7 +159,7 @@ core.register_craftitem("bucket:bucket_empty", {
 
 			-- if space in inventory add filled bucked, otherwise drop as item
 			local inv = user:get_inventory()
-			if inv and inv:room_for_item("main", liquiddef.itemname) then
+			if inv:room_for_item("main", liquiddef.itemname) then
 				inv:add_item("main", liquiddef.itemname)
 			else
 				local upos = user:get_pos()
