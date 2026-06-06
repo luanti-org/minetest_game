@@ -52,6 +52,7 @@ end
 
 function beds.set_spawns(player, bed_pos)
     local name = player:get_player_name()
+    -- don't change spawn location if borrowing a bed
     if not core.is_protected(bed_pos, name) then
         beds.spawn[name] = bed_pos
         beds.save_spawns()
