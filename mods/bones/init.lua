@@ -270,6 +270,7 @@ core.register_on_dieplayer(function(player)
 		notify("Bones placed", S("@1 died at @2, and bones were placed.",
 				player_name, pos_string))
 	else
+		drop(pos, ItemStack("bones:bones"))
 		notify("Inventory dropped", S("@1 died at @2, and dropped their inventory.",
 				player_name, pos_string))
 	end
