@@ -10,9 +10,15 @@ jobs:
         cfg:
           - { image: 'ghcr.io/minetest/minetest:5.9.0' }
           - { image: 'ghcr.io/minetest/minetest:5.10.0' }
+          - { image: 'ghcr.io/luanti-org/luanti:5.11.0' }
+          - { image: 'ghcr.io/luanti-org/luanti:5.12.0' }
+          - { image: 'ghcr.io/luanti-org/luanti:5.13.0' }
+          - { image: 'ghcr.io/luanti-org/luanti:5.14.0' }
+          - { image: 'ghcr.io/luanti-org/luanti:5.15.2' }
+          - { image: 'ghcr.io/luanti-org/luanti:5.16.1' }
           - { image: 'ghcr.io/luanti-org/luanti:master' } # latest git
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - run: ./utils/test/run.sh
       env:
