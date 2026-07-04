@@ -10,7 +10,7 @@ https://forum.luanti.org/viewtopic.php?t=19765
 
 ## Authors of source code
 
-rubenwardy (MIT)
+- rubenwardy (MIT)
 
 ## Authors of media
 

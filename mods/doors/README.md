@@ -4,17 +4,14 @@ See `license.txt` for license information.
 
 ## Authors of source code
 
-Originally by PilzAdam (MIT)
-
-Modified by BlockMen (MIT): Added sounds, glass doors (glass, obsidian glass) and trapdoor.
-
-Modified by sofar (sofar@foo-projects.org) (MIT):
-Added Steel trapdoor.
-Re-implemented most of the door algorithms, added meshes, UV wrapped texture.
-Added doors API to facilitate coding mods accessing and operating doors.
-Added Fence Gate model, code, and sounds.
-
-Various Minetest Game developers and contributors (MIT)
+- Originally by PilzAdam (MIT)
+- Modified by BlockMen (MIT): Added sounds, glass doors (glass, obsidian glass) and trapdoor.
+- Modified by sofar (sofar@foo-projects.org) (MIT):
+  Added Steel trapdoor.
+  Re-implemented most of the door algorithms, added meshes, UV wrapped texture.
+  Added doors API to facilitate coding mods accessing and operating doors.
+  Added Fence Gate model, code, and sounds.
+- Various Minetest Game developers and contributors (MIT)
 
 ## Authors of media (textures)
 

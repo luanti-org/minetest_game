@@ -4,7 +4,7 @@ See `license.txt` for license information.
 
 ## Authors of source code
 
-paramat (MIT)
+- paramat (MIT)
 
 ## Authors of media (sounds)
 

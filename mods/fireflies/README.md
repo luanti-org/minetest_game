@@ -5,7 +5,7 @@ bottles to provide light.
 
 ## Authors of source code
 
-Shara RedCat (MIT)
+- Shara RedCat (MIT)
 
 ## Authors of media (textures)
 

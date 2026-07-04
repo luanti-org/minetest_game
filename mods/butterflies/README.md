@@ -5,7 +5,7 @@ fireflies mod is also enabled.
 
 ## Authors of source code
 
-Shara RedCat (MIT)
+- Shara RedCat (MIT)
 
 ## Authors of media (textures)
 

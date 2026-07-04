@@ -4,10 +4,10 @@ See `license.txt` for license information.
 
 ## Authors of source code
 
-Originally by xyz (MIT)
-BlockMen (MIT)
-sofar (MIT)
-Various Minetest Game developers and contributors (MIT)
+- Originally by xyz (MIT)
+- BlockMen (MIT)
+- sofar (MIT)
+- Various Minetest Game developers and contributors (MIT)
 
 ## Authors of media (textures)
 

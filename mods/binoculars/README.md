@@ -4,7 +4,7 @@ See `license.txt` for license information.
 
 ## Authors of source code
 
-paramat (MIT)
+- paramat (MIT)
 
 ## Authors of media (textures)
 
@@ -16,8 +16,9 @@ paramat (CC BY-SA 3.0):
 
 `binoculars:binoculars`
 
-`default:obsidian_glass` O
-`default:bronze_ingot` B
+default:obsidian_glass O
+
+default:bronze_ingot B
 
     O_O
     BBB

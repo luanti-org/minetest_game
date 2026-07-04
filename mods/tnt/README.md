@@ -4,10 +4,10 @@ See `license.txt` for license information.
 
 ## Authors of source code
 
-PilzAdam (MIT)
-ShadowNinja (MIT)
-sofar (sofar@foo-projects.org) (MIT)
-Various Minetest Game developers and contributors (MIT)
+- PilzAdam (MIT)
+- ShadowNinja (MIT)
+- sofar (sofar@foo-projects.org) (MIT)
+- Various Minetest Game developers and contributors (MIT)
 
 ## Authors of media
 
