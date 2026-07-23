@@ -1,19 +1,70 @@
 default.chest = {}
+default.chest.registered_sizes = {}
 
 -- support for MT game translation.
 local S = default.get_translator
 
+-- Default inventory size (columns x rows)
+local DEFAULT_INV_SIZE = {x = 8, y = 4}
+
+-- Spacing constants (in real_coordinates units)
+local SLOT_SIZE = 1.25
+local PADDING = 0.375
+local CHEST_PLAYER_GAP = 0.5
+local HOTBAR_MAIN_GAP = 0.25
+
+-- Validates inv_size and returns a valid {x, y} table or falls back to
+-- DEFAULT_INV_SIZE with a warning log message.
+local function validate_inv_size(inv_size, chest_name)
+	if inv_size == nil then
+		return DEFAULT_INV_SIZE
+	end
+	assert(type(inv_size) == "table")
+	local x, y = inv_size.x, inv_size.y
+	assert(x > 0 and y > 0)
+	assert(x == math.floor(x) and y == math.floor(y), "Expected whole numbers")
+
+	if x > 16 or y > 16 then
+		core.log("warning", "[default] Chest '" .. chest_name ..
+			"': inv_size values must be 1-16, got {x=" .. x .. ", y=" .. y ..
+			"}. Using default 8x4.")
+		return DEFAULT_INV_SIZE
+	end
+	return {x = x, y = y}
+end
+
 function default.chest.get_chest_formspec(pos)
 	local spos = pos.x .. "," .. pos.y .. "," .. pos.z
-	local formspec =
-		"size[8,9]" ..
-		"list[nodemeta:" .. spos .. ";main;0,0.3;8,4;]" ..
-		"list[current_player;main;0,4.85;8,1;]" ..
-		"list[current_player;main;0,6.08;8,3;8]" ..
+	local node_name = minetest.get_node(pos).name:gsub("_open$", "")
+	local inv_size = default.chest.registered_sizes[node_name] or DEFAULT_INV_SIZE
+
+	local chest_w = inv_size.x * SLOT_SIZE
+	local chest_h = inv_size.y * SLOT_SIZE
+	local player_w = 8 * SLOT_SIZE
+	local player_h = 1 * SLOT_SIZE + HOTBAR_MAIN_GAP + 3 * SLOT_SIZE
+
+	local inner_w = math.max(chest_w, player_w)
+	local inner_h = chest_h + CHEST_PLAYER_GAP + player_h
+
+	local form_w = inner_w + 2 * PADDING
+	local form_h = inner_h + 2 * PADDING
+
+	-- Centering offsets
+	local chest_x = PADDING + (inner_w - chest_w) / 2
+	local chest_y = PADDING
+	local player_x = PADDING + (inner_w - player_w) / 2
+	local hotbar_y = PADDING + chest_h + CHEST_PLAYER_GAP
+	local main_y = hotbar_y + SLOT_SIZE + HOTBAR_MAIN_GAP
+
+	return "formspec_version[2]" ..
+		"size[" .. form_w .. "," .. form_h .. "]" ..
+		"real_coordinates[true]" ..
+		"list[nodemeta:" .. spos .. ";main;" .. chest_x .. "," .. chest_y ..
+			";" .. inv_size.x .. "," .. inv_size.y .. ";]" ..
+		"list[current_player;main;" .. player_x .. "," .. hotbar_y .. ";8,1;]" ..
+		"list[current_player;main;" .. player_x .. "," .. main_y .. ";8,3;8]" ..
 		"listring[nodemeta:" .. spos .. ";main]" ..
-		"listring[current_player;main]" ..
-		default.get_hotbar_bg(0,4.85)
-	return formspec
+		"listring[current_player;main]"
 end
 
 function default.chest.chest_lid_obstructed(pos)
@@ -89,6 +140,9 @@ end)
 function default.chest.register_chest(prefixed_name, d)
 	local name = prefixed_name:sub(1,1) == ':' and prefixed_name:sub(2,-1) or prefixed_name
 	local def = table.copy(d)
+	local inv_size = validate_inv_size(def.inv_size, name)
+	def.inv_size = nil
+	default.chest.registered_sizes[name] = inv_size
 	def.drawtype = "mesh"
 	def.visual = "mesh"
 	def.paramtype = "light"
@@ -102,7 +156,7 @@ function default.chest.register_chest(prefixed_name, d)
 			meta:set_string("infotext", S("Locked Chest"))
 			meta:set_string("owner", "")
 			local inv = meta:get_inventory()
-			inv:set_size("main", 8*4)
+			inv:set_size("main", inv_size.x * inv_size.y)
 		end
 		def.after_place_node = function(pos, placer)
 			local meta = minetest.get_meta(pos)
@@ -207,7 +261,7 @@ function default.chest.register_chest(prefixed_name, d)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("infotext", S("Chest"))
 			local inv = meta:get_inventory()
-			inv:set_size("main", 8*4)
+			inv:set_size("main", inv_size.x * inv_size.y)
 		end
 		def.can_dig = function(pos,player)
 			local meta = minetest.get_meta(pos);
@@ -276,7 +330,10 @@ function default.chest.register_chest(prefixed_name, d)
 	minetest.register_node(prefixed_name, def_closed)
 	minetest.register_node(prefixed_name .. "_open", def_opened)
 
-	-- convert old chests to this new variant
+	-- Convert old chests to this new variant.
+	-- Clears stored formspec so the dynamic formspec generation (with
+	-- configurable inv_size) is used on next open. Existing inventory
+	-- items are preserved; no resizing is performed.
 	if name == "default:chest" or name == "default:chest_locked" then
 		minetest.register_lbm({
 			label = "update chests to opening chests",
