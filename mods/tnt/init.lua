@@ -424,19 +424,19 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 		queued_data.fn(queued_data.pos)
 	end
 
-	minetest.log("action", "TNT owned by " .. owner .. " detonated at " ..
+	minetest.log("action", "TNT/Explosion owned/caused by " .. owner .. " detonated at " ..
 		minetest.pos_to_string(pos) .. " with radius " .. radius)
 
 	return drops, radius
 end
 
-function tnt.boom(pos, def)
+function tnt.boom(pos, def, igniter)
 	def = def or {}
 	def.radius = def.radius or 1
 	def.damage_radius = def.damage_radius or def.radius * 2
 	local meta = minetest.get_meta(pos)
-	local owner = meta:get_string("owner")
-	if not def.explode_center and def.ignore_protection ~= true then
+	local owner = igniter or meta:get_string("owner")
+	if not def.explode_center and (def.ignore_protection or not minetest.is_protected(pos, owner)) then
 		minetest.set_node(pos, {name = "tnt:boom"})
 	end
 	local sound = def.sound or "tnt_explode"
@@ -658,6 +658,9 @@ function tnt.register_tnt(def)
 				end
 			end,
 			on_punch = function(pos, node, puncher)
+                if minetest.is_protected(pos, puncher:get_player_name()) then
+                    return
+                end
 				if puncher:get_wielded_item():get_name() == "default:torch" then
 					minetest.swap_node(pos, {name = name .. "_burning"})
 					minetest.registered_nodes[name .. "_burning"].on_construct(pos)
@@ -681,8 +684,10 @@ function tnt.register_tnt(def)
 				minetest.registered_nodes[name .. "_burning"].on_construct(pos)
 			end,
 			on_ignite = function(pos, igniter)
-				minetest.swap_node(pos, {name = name .. "_burning"})
-				minetest.registered_nodes[name .. "_burning"].on_construct(pos)
+                if not minetest.is_protected(pos, igniter:get_player_name()) then
+                    minetest.swap_node(pos, {name = name .. "_burning"})
+                    minetest.registered_nodes[name .. "_burning"].on_construct(pos)
+                end
 			end,
 		})
 	end
