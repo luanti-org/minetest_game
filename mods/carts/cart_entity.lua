@@ -6,10 +6,9 @@ local S = carts.get_translator
 local cart_entity = {
 	initial_properties = {
 		physical = false, -- otherwise going uphill breaks
-		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+		selectionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		visual = "mesh",
-		mesh = "carts_cart.b3d",
-		visual_size = {x=1, y=1},
+		mesh = "carts_cart.obj",
 		textures = {"carts_cart.png"},
 	},
 
@@ -19,6 +18,7 @@ local cart_entity = {
 	old_dir = {x=1, y=0, z=0}, -- random value to start the cart on punch
 	old_pos = nil,
 	old_switch = 0,
+	current_pitch = 0, -- smoothly interpolated pitch for visual rotation
 	railtype = nil,
 	attached_items = {}
 }
@@ -181,12 +181,17 @@ end
 local v3_len = vector.length
 local function rail_on_step(self, dtime)
 	local vel = self.object:get_velocity()
+	local entry_speed = v3_len(vel) -- save speed before any modifications
 	if self.punched then
 		vel = vector.add(vel, self.velocity)
 		self.object:set_velocity(vel)
 		self.old_dir.y = 0
 	elseif vector.equals(vel, {x=0, y=0, z=0}) then
-		return
+		-- Don't return if there's acceleration (gravity on slope will restart movement)
+		local acc = self.object:get_acceleration()
+		if not acc or vector.equals(acc, {x=0, y=0, z=0}) then
+			return
+		end
 	end
 
 	local pos = self.object:get_pos()
@@ -242,9 +247,11 @@ local function rail_on_step(self, dtime)
 	-- switch_keys: Currently pressed L(1) or R(2) key,
 	--              used to ignore the key on the next rail node
 	local switch_keys
+	local pre_wiggle_dir  -- save direction before wiggle overwrites it
 	dir, switch_keys = carts:get_rail_direction(
 		pos, dir, ctrl, self.old_switch, self.railtype
 	)
+	pre_wiggle_dir = vector.new(dir)
 	dir_changed = not vector.equals(dir, self.old_dir)
 
 	local acc = 0
@@ -257,11 +264,26 @@ local function rail_on_step(self, dtime)
 			pos = self.old_pos
 		elseif not stop_wiggle then
 			-- End of rail: Smooth out.
-			pos = pos_r
-			dir_changed = false
-			dir.y = 0
+			-- But if we were on a slope, keep the slope position
+			if self.old_dir.y ~= 0 and self.old_pos then
+				pos = vector.new(self.old_pos)
+			else
+				pos = pos_r
+				dir_changed = false
+				dir.y = 0
+			end
 		else
-			pos.y = math.floor(pos.y + 0.5)
+			-- Stop wiggle: if there's a slope ahead that we couldn't climb,
+			-- give a small push back the way we came
+			if pre_wiggle_dir.y ~= 0 then
+				-- pre_wiggle_dir is the slope direction (e.g. 0,1,-1)
+				-- Reverse it and flatten Y to roll back on the flat rail
+				-- Bounce back proportional to the speed we had
+				local bounce_speed = math.max(1, entry_speed * 0.5)
+				dir = {x = -pre_wiggle_dir.x, y = 0, z = -pre_wiggle_dir.z}
+				vel = vector.multiply(dir, bounce_speed)
+			end
+			pos = vector.round(pos)
 		end
 		update.pos = true
 		update.vel = true
@@ -352,15 +374,10 @@ local function rail_on_step(self, dtime)
 	elseif dir.z < 0 then
 		yaw = 1
 	end
-	self.object:set_yaw(yaw * math.pi)
 
-	local anim = {x=0, y=0}
-	if dir.y == -1 then
-		anim = {x=1, y=1}
-	elseif dir.y == 1 then
-		anim = {x=2, y=2}
-	end
-	self.object:set_animation(anim, 1, 0)
+	-- Set target pitch and yaw (smooth lerp applied in on_step)
+	self.target_pitch = carts:get_sign(dir.y) * 0.25 * math.pi
+	self.target_yaw = yaw * math.pi
 
 	if update.vel then
 		self.object:set_velocity(vel)
@@ -380,6 +397,26 @@ end
 function cart_entity:on_step(dtime)
 	rail_on_step(self, dtime)
 	rail_sound(self, dtime)
+
+	-- Smooth pitch lerp (we control interpolation since engine is disabled)
+	local target = self.target_pitch or 0
+	local diff = target - self.current_pitch
+	if math.abs(diff) > 0.001 then
+		-- Faster cart = faster rotation. Min 6 rad/s, scales with speed
+		local vel = self.object:get_velocity()
+		local speed = vel and vector.length(vel) or 0
+		local rate = math.max(6, speed * 2) * dtime
+		if math.abs(diff) <= rate then
+			self.current_pitch = target
+		else
+			self.current_pitch = self.current_pitch + rate * carts:get_sign(diff)
+		end
+	else
+		self.current_pitch = target
+	end
+
+	local yaw = self.target_yaw or 0
+	self.object:set_rotation(vector.new(self.current_pitch, yaw, 0), false)
 end
 
 minetest.register_entity("carts:cart", cart_entity)
