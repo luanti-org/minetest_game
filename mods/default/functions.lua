@@ -525,7 +525,8 @@ default.after_place_leaves = function(pos, placer, itemstack, pointed_thing)
 	if placer and placer:is_player() then
 		local node = minetest.get_node(pos)
 		node.param2 = 1
-		minetest.set_node(pos, node)
+		-- node has already been placed so we use swap
+		minetest.swap_node(pos, node)
 	end
 end
 
@@ -536,7 +537,7 @@ local function leafdecay_after_destruct(pos, oldnode, def)
 		local node = minetest.get_node(v)
 		local timer = minetest.get_node_timer(v)
 		if node.param2 ~= 1 and not timer:is_started() then
-			timer:start(math.random(20, 120) / 10)
+			timer:start(math.random(20, 120) * 0.1)
 		end
 	end
 end
