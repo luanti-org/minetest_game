@@ -138,7 +138,7 @@ function boat.on_step(self, dtime)
 		local driver_objref = minetest.get_player_by_name(self.driver)
 		if driver_objref then
 			local ctrl = driver_objref:get_player_control()
-			if ctrl.up and ctrl.down then
+			if ctrl.aux1 then
 				if not self.auto then
 					self.auto = true
 					minetest.chat_send_player(self.driver, S("Boat cruise mode on"))
@@ -234,7 +234,11 @@ minetest.register_entity("boats:boat", boat)
 
 
 minetest.register_craftitem("boats:boat", {
-	description = S("Boat"),
+	description = table.concat({
+		S("Boat"),
+		S("- Steer using movement controls"),
+		S("- Press Aux1 to enable cruise mode, steer backwards to disable"),
+	}, "\n"),
 	inventory_image = "boats_inventory.png",
 	wield_image = "boats_wield.png",
 	wield_scale = {x = 2, y = 2, z = 1},

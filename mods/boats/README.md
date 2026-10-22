@@ -19,7 +19,7 @@ modified by sofar (CC BY-SA 3.0)
 - Right mouse button = Enter or exit boat when pointing at boat.
 - Forward = Speed up.
   Slow down when moving backwards.
-- Forward + backward = Enable cruise mode: Boat will accelerate to maximum forward
+- Aux1 = Enable cruise mode: Boat will accelerate to maximum forward
   speed and remain at that speed without needing to hold the forward key.
 - Backward = Slow down.
   Speed up when moving backwards.
