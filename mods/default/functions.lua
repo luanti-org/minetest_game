@@ -525,7 +525,8 @@ default.after_place_leaves = function(pos, placer, itemstack, pointed_thing)
 	if placer and placer:is_player() then
 		local node = minetest.get_node(pos)
 		node.param2 = 1
-		minetest.set_node(pos, node)
+		-- node has already been placed so we use swap
+		minetest.swap_node(pos, node)
 	end
 end
 
