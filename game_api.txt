@@ -122,6 +122,8 @@ The chests API allows the creation of chests, which have their own inventories f
 
  * Returns a formspec for a specific chest.
  * `pos` Location of the chest node, e.g `{x = 1, y = 1, z = 1}`
+ * The inventory size is resolved automatically from the node name at `pos`
+   via `default.chest.registered_sizes`.
 
 `default.chest.chest_lid_obstructed(pos)`
 
@@ -162,6 +164,36 @@ The chests API allows the creation of chests, which have their own inventories f
 	sound_close = "default_chest_close",
 	groups = {choppy = 2, oddly_breakable_by_hand = 2},
 	protected = false, -- If true, only placer can modify chest.
+	inv_size = {x = 8, y = 4},
+	-- Optional. Table specifying chest inventory grid dimensions as
+	-- `{x = <columns>, y = <rows>}`. Defaults to `{x = 8, y = 4}` (32 slots)
+	-- if omitted.
+	-- `x` and `y` must be integers in the range [1, 16]. If either value is
+	-- invalid (non-integer, out of range, or inv_size is not a table), a warning
+	-- is logged and the chest falls back to the default 8x4 size.
+	-- Note: changing `inv_size` only affects newly placed chests. Already-placed
+	-- chests retain their original inventory size. To migrate existing chests
+	-- after a size change, register a custom LBM.
+
+#### Example: Registering a chest with a custom inventory size
+
+	default.chest.register_chest("mymod:large_chest", {
+		description = "Large Chest",
+		tiles = {
+			"mymod_large_chest_top.png",
+			"mymod_large_chest_top.png",
+			"mymod_large_chest_side.png",
+			"mymod_large_chest_side.png",
+			"mymod_large_chest_front.png",
+			"mymod_large_chest_inside.png"
+		},
+		sounds = default.node_sound_wood_defaults(),
+		sound_open = "default_chest_open",
+		sound_close = "default_chest_close",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2},
+		protected = false,
+		inv_size = {x = 12, y = 6},
+	})
 
 
 Doors API
