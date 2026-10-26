@@ -8,7 +8,7 @@ function weather.get(player)
 end
 
 local function do_update()
-	for _, player in ipairs(minetest.get_connected_players()) do
+	for _, player in ipairs(core.get_connected_players()) do
 		local params = weather.get(player)
 		assert(params ~= nil, "weather.get() must not return nil")
 		if params.clouds then
@@ -22,11 +22,11 @@ end
 
 local function cyclic_update()
 	do_update()
-	minetest.after(CYCLE, cyclic_update)
+	core.after(CYCLE, cyclic_update)
 end
-minetest.after(0, cyclic_update)
+core.after(0, cyclic_update)
 
 -- Update on player join to instantly alter clouds from the default
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	do_update()
 end)

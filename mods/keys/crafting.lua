@@ -2,7 +2,7 @@
 -- Crafting recipes
 --
 
-minetest.register_craft({
+core.register_craft({
 	output = "keys:skeleton_key",
 	recipe = {
 		{"default:gold_ingot"},
@@ -13,14 +13,14 @@ minetest.register_craft({
 -- Cooking recipes
 --
 
-minetest.register_craft({
+core.register_craft({
 	type = "cooking",
 	output = "default:gold_ingot",
 	recipe = "keys:key",
 	cooktime = 5,
 })
 
-minetest.register_craft({
+core.register_craft({
 	type = "cooking",
 	output = "default:gold_ingot",
 	recipe = "keys:skeleton_key",

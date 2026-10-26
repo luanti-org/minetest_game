@@ -2,10 +2,10 @@
 
 walls = {}
 
-local fence_collision_extra = minetest.settings:get_bool("enable_fence_tall") and 3/8 or 0
+local fence_collision_extra = core.settings:get_bool("enable_fence_tall") and 3/8 or 0
 
 -- Load support for MT game translation.
-local S = minetest.get_translator("walls")
+local S = core.get_translator("walls")
 
 walls.register = function(wall_name, wall_desc, wall_texture_table, wall_mat, wall_sounds)
 	--make wall_texture_table paramenter backwards compatible for mods passing single texture
@@ -13,7 +13,7 @@ walls.register = function(wall_name, wall_desc, wall_texture_table, wall_mat, wa
 		wall_texture_table = { wall_texture_table }
 	end
 	-- inventory node, and pole-type wall start item
-	minetest.register_node(wall_name, {
+	core.register_node(wall_name, {
 		description = wall_desc,
 		drawtype = "nodebox",
 		node_box = {
@@ -51,7 +51,7 @@ walls.register = function(wall_name, wall_desc, wall_texture_table, wall_mat, wa
 	if wall_name:sub(1, 1) == ":" then
 		wall_name = wall_name:sub(2)
 	end
-	minetest.register_craft({
+	core.register_craft({
 		output = wall_name .. " 6",
 		recipe = {
 			{ "", "", "" },
