@@ -1,5 +1,5 @@
-local S = minetest.get_translator("mtg_craftguide")
-local esc = minetest.formspec_escape
+local S = core.get_translator("mtg_craftguide")
+local esc = core.formspec_escape
 
 local player_data = {}
 local init_items = {}
@@ -78,12 +78,12 @@ local function groups_to_item(groups)
 		local group = groups[1]
 		if group_stereotypes[group] then
 			return group_stereotypes[group]
-		elseif minetest.registered_items["default:"..group] then
+		elseif core.registered_items["default:"..group] then
 			return "default:"..group
 		end
 	end
 
-	for name, def in pairs(minetest.registered_items) do
+	for name, def in pairs(core.registered_items) do
 		if item_has_groups(def.groups, groups) then
 			return name
 		end
@@ -93,7 +93,7 @@ local function groups_to_item(groups)
 end
 
 local function get_craftable_recipes(output)
-	local recipes = minetest.get_all_craft_recipes(output)
+	local recipes = core.get_all_craft_recipes(output)
 	if not recipes then
 		return nil
 	end
@@ -104,7 +104,7 @@ local function get_craftable_recipes(output)
 			if groups then
 				item = groups_to_item(groups)
 			end
-			if not minetest.registered_items[item] then
+			if not core.registered_items[item] then
 				table.remove(recipes, i)
 				break
 			end
@@ -126,7 +126,7 @@ local function cache_usages(recipe)
 		if not added[item] then
 			local groups = extract_groups(item)
 			if groups then
-				for name, def in pairs(minetest.registered_items) do
+				for name, def in pairs(core.registered_items) do
 					if not added[name] and show_item(def)
 							and item_has_groups(def.groups, groups) then
 						local usage = table.copy(recipe)
@@ -136,7 +136,7 @@ local function cache_usages(recipe)
 						added[name] = true
 					end
 				end
-			elseif show_item(minetest.registered_items[item]) then
+			elseif show_item(core.registered_items[item]) then
 				usages_cache[item] = usages_cache[item] or {}
 				table.insert(usages_cache[item], recipe)
 			end
@@ -145,8 +145,8 @@ local function cache_usages(recipe)
 	end
 end
 
-minetest.after(0.01, function()
-	for name, def in pairs(minetest.registered_items) do
+core.after(0.01, function()
+	for name, def in pairs(core.registered_items) do
 		if show_item(def) then
 			local recipes = get_craftable_recipes(name)
 			if recipes then
@@ -157,7 +157,7 @@ minetest.after(0.01, function()
 			end
 		end
 	end
-	for name, def in pairs(minetest.registered_items) do
+	for name, def in pairs(core.registered_items) do
 		if recipes_cache[name] or usages_cache[name] then
 			table.insert(init_items, name)
 		end
@@ -170,7 +170,7 @@ local function coords(i, cols)
 end
 
 local function is_fuel(item)
-	return minetest.get_craft_result({method="fuel", items={item}}).time > 0
+	return core.get_craft_result({method="fuel", items={item}}).time > 0
 end
 
 local function item_button_fs(fs, x, y, item, element_name, groups)
@@ -184,15 +184,15 @@ local function item_button_fs(fs, x, y, item, element_name, groups)
 		if not tooltip then
 			local groupstr = {}
 			for _, group in ipairs(groups) do
-				table.insert(groupstr, minetest.colorize("yellow", group))
+				table.insert(groupstr, core.colorize("yellow", group))
 			end
 			groupstr = table.concat(groupstr, ", ")
 			tooltip = S("Any item belonging to the group(s): @1", groupstr)
 		end
 	elseif is_fuel(item) then
-		local itemdef = minetest.registered_items[item:match("%S*")]
+		local itemdef = core.registered_items[item:match("%S*")]
 		local desc = itemdef and itemdef.description or S("Unknown Item")
-		tooltip = desc.."\n"..minetest.colorize("orange", S("Fuel"))
+		tooltip = desc.."\n"..core.colorize("orange", S("Fuel"))
 	end
 	if tooltip then
 		table.insert(fs, ("tooltip[%s;%s]"):format(element_name, esc(tooltip)))
@@ -255,7 +255,7 @@ local function recipe_fs(fs, data)
 		table.insert(fs, ("image[3.2,0.5;0.5,0.5;craftguide_%s.png]")
 			:format(shapeless and "shapeless" or "furnace"))
 		local tooltip = shapeless and S("Shapeless") or
-			S("Cooking time: @1", minetest.colorize("yellow", cooktime))
+			S("Cooking time: @1", core.colorize("yellow", cooktime))
 		table.insert(fs, "tooltip[3.2,0.5;0.5,0.5;"..esc(tooltip).."]")
 	end
 	table.insert(fs, "image[3,1;1,1;sfinv_crafting_arrow.png]")
@@ -272,7 +272,7 @@ local function get_formspec(player)
 	table.insert(fs,
 		"style_type[item_image_button;padding=2]"..
 		"field[0.3,4.2;2.8,1.2;filter;;"..esc(data.filter).."]"..
-		"label[5.8,4.15;"..minetest.colorize("yellow", data.pagenum).." / "..
+		"label[5.8,4.15;"..core.colorize("yellow", data.pagenum).." / "..
 			data.pagemax.."]"..
 		"image_button[2.63,4.05;0.8,0.8;craftguide_search_icon.png;search;]"..
 		"image_button[3.25,4.05;0.8,0.8;craftguide_clear_icon.png;clear;]"..
@@ -325,8 +325,8 @@ local function execute_search(data)
 	data.items = {}
 
 	for _, item in ipairs(init_items) do
-		local def = minetest.registered_items[item]
-		local desc = def and minetest.get_translated_string(data.lang_code, def.description)
+		local def = core.registered_items[item]
+		local desc = def and core.get_translated_string(data.lang_code, def.description)
 
 		if imatch(item, filter) or desc and imatch(desc, filter) then
 			table.insert(data.items, item)
@@ -408,9 +408,9 @@ local function on_receive_fields(player, fields)
 	end
 end
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
-	local info = minetest.get_player_information(name)
+	local info = core.get_player_information(name)
 
 	player_data[name] = {
 		filter = "",
@@ -420,7 +420,7 @@ minetest.register_on_joinplayer(function(player)
 	}
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	local name = player:get_player_name()
 	player_data[name] = nil
 end)

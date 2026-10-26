@@ -3,7 +3,7 @@
 dye = {}
 
 -- Load support for MT game translation.
-local S = minetest.get_translator("dye")
+local S = core.get_translator("dye")
 
 -- Make dye names and descriptions available globally
 
@@ -33,13 +33,13 @@ for _, row in ipairs(dye.dyes) do
 	local groups = {dye = 1}
 	groups["color_" .. name] = 1
 
-	minetest.register_craftitem("dye:" .. name, {
+	core.register_craftitem("dye:" .. name, {
 		inventory_image = "dye_" .. name .. ".png",
 		description = S(description .. " Dye"),
 		groups = groups
 	})
 
-	minetest.register_craft({
+	core.register_craft({
 		output = "dye:" .. name .. " 4",
 		recipe = {
 			{"group:flower,color_" .. name}
@@ -49,7 +49,7 @@ end
 
 -- Manually add coal -> black dye
 
-minetest.register_craft({
+core.register_craft({
 	output = "dye:black 4",
 	recipe = {
 		{"group:coal"}
@@ -58,7 +58,7 @@ minetest.register_craft({
 
 -- Manually add blueberries->violet dye
 
-minetest.register_craft({
+core.register_craft({
 	output = "dye:violet 2",
 	recipe = {
 		{"default:blueberries"}
@@ -97,7 +97,7 @@ local dye_recipes = {
 }
 
 for _, mix in pairs(dye_recipes) do
-	minetest.register_craft({
+	core.register_craft({
 		type = "shapeless",
 		output = "dye:" .. mix[3] .. " 2",
 		recipe = {"dye:" .. mix[1], "dye:" .. mix[2]},
