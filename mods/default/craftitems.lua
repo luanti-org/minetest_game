@@ -196,7 +196,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 		tab_number = tab
 		local formspec = formspec_header .. formspec_core(tab) .. contents
-		minetest.show_formspec(player_name, "default:book", formspec)
+		core.show_formspec(player_name, "default:book", formspec)
 		return
 	end
 
