@@ -14,7 +14,10 @@ local title_bar_height = 1
 local page_height = 6
 local button_minor, button_major = 0.75, 3
 local text_margin = 0.1
-local text_height = 0.25
+
+local owner_x, owner_y = 0.5, 0.25
+local read_title_x, read_title_y = 0.5, 0.75
+local page_label_offset = 0.75
 
 -- generated values
 local _form_width = margin + body_width + margin
@@ -54,21 +57,31 @@ end
 local function formspec_read(owner, title, string, text, page, page_max)
 	return
 		("label[%.2f,%.2f;%s]"):format(
-			margin, margin,
+			margin + owner_x, margin + owner_y,
 			esc(S("by @1", owner))
 		) ..
 		("label[%.2f,%.2f;%s]"):format(
-			margin, margin + text_height,
+			margin + read_title_x, margin + read_title_y,
 			esc(core.colorize("#FFFF00", title))
 		) ..
 		("textarea[%.2f,%.2f;%.2f,%.2f;;%s;]"):format(
-				margin, margin + text_margin + title_bar_height + padding + text_margin,
-				body_width, page_height,
-				esc(string ~= "" and string or text)
+			margin, margin + text_margin + title_bar_height + padding + text_margin,
+			body_width, page_height,
+			esc(string ~= "" and string or text)
 		) ..
-		"button[2.4,7.6;0.8,0.8;book_prev;<]" ..
-		"label[3.2,7.7;" .. esc(S("Page @1 of @2", page, page_max)) .. "]" ..
-		"button[4.9,7.6;0.8,0.8;book_next;>]"
+		("button[%.2f,%.2f;%.2f,%.2f;book_prev;<]"):format(
+			(_form_width - button_major) * 0.5 - button_minor, margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding,
+			button_minor, button_minor
+		) ..
+		("button[%.2f,%.2f;%.2f,%.2f;book_prev;>]"):format(
+			(_form_width + button_major) * 0.5, margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding,
+			button_minor, button_minor
+		) ..
+		("label[%.2f,%.2f;%s]"):format(
+			(_form_width - button_major) * 0.5 + page_label_offset,
+			margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding + button_minor * 0.5,
+			esc(S("Page @1 of @2", page, page_max))
+		)
 end
 
 local function formspec_string(lpp, page, lines, string)
