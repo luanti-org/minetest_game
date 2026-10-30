@@ -1,6 +1,6 @@
 Minetest Game API
 =================
-GitHub Repo: https://github.com/minetest/minetest_game
+GitHub Repo: https://github.com/luanti-org/minetest_game
 
 
 Introduction
@@ -8,7 +8,7 @@ Introduction
 
 The Minetest Game game offers multiple new possibilities in addition to the Luanti engine's built-in API,
 allowing you to add new plants to farming mod, buckets for new liquids, new stairs and custom panes.
-For information on the Luanti API, visit https://github.com/minetest/minetest/blob/master/doc/lua_api.txt
+For information on the Luanti API, visit https://github.com/luanti-org/luanti/blob/master/doc/lua_api.md
 Please note:
 
  * [XYZ] refers to a section the Luanti API
