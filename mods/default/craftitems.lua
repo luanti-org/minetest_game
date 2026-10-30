@@ -3,8 +3,26 @@
 -- support for MT game translation.
 local S = default.get_translator
 
-local esc = minetest.formspec_escape
-local formspec_size = "size[8,8]"
+local esc = core.formspec_escape
+
+-- formspec parameters
+local margin = 0.35
+local body_width = 8
+local padding = 0.5
+local minor_padding = 0.25
+local title_bar_height = 1
+local page_height = 6
+local button_minor, button_major = 0.75, 3
+local text_margin = 0.1
+local text_height = 0.25
+
+-- generated values
+local _form_width = margin + body_width + margin
+local _form_height = margin + title_bar_height + padding + page_height + padding + button_minor + margin
+
+local formspec_size = ("size[%.2f,%.2f]"):format(_form_width, _form_height)
+local formspec_version = "formspec_version[4]"
+local formspec_header = formspec_version .. formspec_size
 
 local function formspec_core(tab)
 	if tab == nil then tab = 1 else tab = tostring(tab) end
@@ -15,20 +33,39 @@ local function formspec_core(tab)
 end
 
 local function formspec_write(title, text)
-	return "field[0.5,1;7.5,0;title;" .. esc(S("Title:")) .. ";" ..
-			esc(title) .. "]" ..
-		"textarea[0.5,1.5;7.5,7;text;" .. esc(S("Contents:")) .. ";" ..
-			esc(text) .. "]" ..
-		"button_exit[2.5,7.5;3,1;save;" .. esc(S("Save")) .. "]"
+	return
+		("field[%.2f,%.2f;%.2f,%.2f;title;%s;%s]"):format(
+			margin, margin + text_margin,
+			body_width, title_bar_height,
+			esc(S("Title:")), esc(title)
+		) ..
+		("textarea[%.2f,%.2f;%.2f,%.2f;text;%s;%s]"):format(
+			margin, margin + text_margin + title_bar_height + padding + text_margin,
+			body_width, page_height,
+			esc(S("Contents:")), esc(text)
+		) ..
+		("button_exit[%.2f,%.2f;%.2f,%.2f;save;%s]"):format(
+			(_form_width - button_major) * 0.5, margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding,
+			button_major, button_minor,
+			esc(S("Save"))
+		)
 end
 
 local function formspec_read(owner, title, string, text, page, page_max)
-	return "label[0.5,0.5;" .. esc(S("by @1", owner)) .. "]" ..
-		"tablecolumns[color;text]" ..
-		"tableoptions[background=#00000000;highlight=#00000000;border=false]" ..
-		"table[0.4,0;7,0.5;title;#FFFF00," .. esc(title) .. "]" ..
-		"textarea[0.5,1.5;7.5,7;;" ..
-			esc(string ~= "" and string or text) .. ";]" ..
+	return
+		("label[%.2f,%.2f;%s]"):format(
+			margin, margin,
+			esc(S("by @1", owner))
+		) ..
+		("label[%.2f,%.2f;%s]"):format(
+			margin, margin + text_height,
+			esc(core.colorize("#FFFF00", title))
+		) ..
+		("textarea[%.2f,%.2f;%.2f,%.2f;;%s;]"):format(
+				margin, margin + text_margin + title_bar_height + padding + text_margin,
+				body_width, page_height,
+				esc(string ~= "" and string or text)
+		) ..
 		"button[2.4,7.6;0.8,0.8;book_prev;<]" ..
 		"label[3.2,7.7;" .. esc(S("Page @1 of @2", page, page_max)) .. "]" ..
 		"button[4.9,7.6;0.8,0.8;book_next;>]"
@@ -57,7 +94,7 @@ local function book_on_use(itemstack, user)
 	local page, page_max, lines, string = 1, 1, {}, ""
 
 	-- Backwards compatibility
-	local old_data = minetest.deserialize(itemstack:get_meta():get_string(""))
+	local old_data = core.deserialize(itemstack:get_meta():get_string(""))
 	if old_data then
 		meta:from_table({ fields = old_data })
 	end
@@ -95,7 +132,7 @@ local function book_on_use(itemstack, user)
 		formspec = formspec_read(owner, title, string, text, page, page_max)
 	end
 
-	minetest.show_formspec(player_name, "default:book", formspec_size .. formspec)
+	core.show_formspec(player_name, "default:book", formspec_header .. formspec)
 	-- Store the wield index in case the user accidentally switches before the formspec is shown
 	book_writers[player_name] = {wield_index = user:get_wield_index()}
 	return itemstack
@@ -145,7 +182,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			return -- malicious data
 		end
 		tab_number = tab
-		local formspec = formspec_size .. formspec_core(tab) .. contents
+		local formspec = formspec_header .. formspec_core(tab) .. contents
 		minetest.show_formspec(player_name, "default:book", formspec)
 		return
 	end
