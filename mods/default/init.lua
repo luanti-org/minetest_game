@@ -44,11 +44,11 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 function default.get_hotbar_bg(x,y)
-	local out = ""
+	local out = {}
 	for i=0,7,1 do
-		out = out .."image["..x+i..","..y..";1,1;gui_hb_bg.png]"
+		out[i + 1] = ("image[%.2f,%.2f;1,1;gui_hb_bg.png]"):format(x + i * 1.25, y)
 	end
-	return out
+	return table.concat(out)
 end
 
 default.gui_survival_form = "size[8,8.5]"..
