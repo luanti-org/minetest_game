@@ -11,7 +11,9 @@ beds.pos = {}
 beds.spawn = {}
 beds.get_translator = S
 
-beds.formspec = "size[8,11;true]" ..
+beds.formspec =
+	"formspec_version[4]" ..
+	"size[8,11;true]" ..
 	"no_prepend[]" ..
 	"bgcolor[#080808BB;true]" ..
 	"button_exit[2,10;4,0.75;leave;" .. esc(S("Leave Bed")) .. "]"
