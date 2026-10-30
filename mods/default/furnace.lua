@@ -10,38 +10,48 @@ local furnace_fire_sounds = {}
 -- Formspecs
 --
 
-function default.get_furnace_active_formspec(fuel_percent, item_percent)
-	return "size[8,8.5]"..
-		"list[context;src;2.75,0.5;1,1;]"..
-		"list[context;fuel;2.75,2.5;1,1;]"..
-		"image[2.75,1.5;1,1;default_furnace_fire_bg.png^[lowpart:"..
-		(fuel_percent)..":default_furnace_fire_fg.png]"..
-		"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[lowpart:"..
-		(item_percent)..":gui_furnace_arrow_fg.png^[transformR270]"..
-		"list[context;dst;4.75,0.96;2,2;]"..
-		default.get_main_player_inventory_elements(0, 4.25),
-		"listring[context;dst]"..
-		"listring[current_player;main]"..
-		"listring[context;src]"..
-		"listring[current_player;main]"..
-		"listring[context;fuel]"..
-		"listring[current_player;main]"
-end
+local margin = 0.5
+local gap = 0.75
+
+local slot_size, slot_spacing = 1, 0.25
+
+local furnace_body_height = 3 * slot_size + 2 * slot_spacing
+local furnace_body_width = 4 * slot_size + 3 * slot_spacing
+
+local _slot_interval = slot_size + slot_spacing
+local _form_body_width = 8 * _slot_interval - slot_spacing
+local _furnace_body_x = margin + (_form_body_width - furnace_body_width) * 0.5
+local _inv_height = 4 * _slot_interval -- player inventory height
+
+local formspec_base = table.concat({
+	"formspec_version[4]",
+	("size[%.2f,%.2f]"):format(margin + _form_body_width + margin, margin + furnace_body_height + gap + _inv_height + margin),
+	("list[context;src;%.2f,%.2f;1,1;]"):format(_furnace_body_x, margin),
+	("list[context;fuel;%.2f,%.2f;1,1;]"):format(_furnace_body_x, margin + _slot_interval * 2),
+	("list[context;dst;%.2f,%.2f;2,2;]"):format(_furnace_body_x + _slot_interval * 2, margin + _slot_interval* 0.5),
+	default.get_main_player_inventory_elements(margin, margin + furnace_body_height + gap),
+	"listring[context;dst]",
+	"listring[current_player;main]",
+	"listring[context;src]",
+	"listring[current_player;main]",
+	"listring[context;fuel]",
+	"listring[current_player;main]",
+})
 
 function default.get_furnace_inactive_formspec()
-	return "size[8,8.5]"..
-		"list[context;src;2.75,0.5;1,1;]"..
-		"list[context;fuel;2.75,2.5;1,1;]"..
-		"image[2.75,1.5;1,1;default_furnace_fire_bg.png]"..
-		"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
-		"list[context;dst;4.75,0.96;2,2;]"..
-		default.get_main_player_inventory_elements(0, 4.25),
-		"listring[context;dst]"..
-		"listring[current_player;main]"..
-		"listring[context;src]"..
-		"listring[current_player;main]"..
-		"listring[context;fuel]"..
-		"listring[current_player;main]"
+	return table.concat({
+		formspec_base,
+		("image[%.2f,%.2f;1,1;default_furnace_fire_bg.png]"):format(_furnace_body_x, margin + _slot_interval),
+		("image[%.2f,%.2f;1,1;gui_furnace_arrow_bg.png^[transformR270]"):format(_furnace_body_x + _slot_interval, margin + _slot_interval)
+	})
+end
+
+function default.get_furnace_active_formspec(fuel_percent, item_percent)
+	return table.concat({
+		formspec_base,
+		("image[%.2f,%.2f;1,1;default_furnace_fire_bg.png^[lowpart:%d:default_furnace_fire_fg.png]"):format(_furnace_body_x, margin + _slot_interval, fuel_percent),
+		("image[%.2f,%.2f;1,1;gui_furnace_arrow_bg.png^[lowpart:%d:gui_furnace_arrow_fg.png^[transformR270]"):format(_furnace_body_x + _slot_interval, margin + _slot_interval, item_percent),
+	})
 end
 
 --
