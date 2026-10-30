@@ -19,15 +19,13 @@ function default.get_furnace_active_formspec(fuel_percent, item_percent)
 		"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[lowpart:"..
 		(item_percent)..":gui_furnace_arrow_fg.png^[transformR270]"..
 		"list[context;dst;4.75,0.96;2,2;]"..
-		"list[current_player;main;0,4.25;8,1;]"..
-		"list[current_player;main;0,5.5;8,3;8]"..
+		default.get_main_player_inventory_elements(0, 4.25),
 		"listring[context;dst]"..
 		"listring[current_player;main]"..
 		"listring[context;src]"..
 		"listring[current_player;main]"..
 		"listring[context;fuel]"..
-		"listring[current_player;main]"..
-		default.get_hotbar_bg(0, 4.25)
+		"listring[current_player;main]"
 end
 
 function default.get_furnace_inactive_formspec()
@@ -37,15 +35,13 @@ function default.get_furnace_inactive_formspec()
 		"image[2.75,1.5;1,1;default_furnace_fire_bg.png]"..
 		"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
 		"list[context;dst;4.75,0.96;2,2;]"..
-		"list[current_player;main;0,4.25;8,1;]"..
-		"list[current_player;main;0,5.5;8,3;8]"..
+		default.get_main_player_inventory_elements(0, 4.25),
 		"listring[context;dst]"..
 		"listring[current_player;main]"..
 		"listring[context;src]"..
 		"listring[current_player;main]"..
 		"listring[context;fuel]"..
-		"listring[current_player;main]"..
-		default.get_hotbar_bg(0, 4.25)
+		"listring[current_player;main]"
 end
 
 --

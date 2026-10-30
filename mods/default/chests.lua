@@ -20,11 +20,9 @@ function default.chest.get_chest_formspec(pos)
 		"formspec_version[4]",
 		("size[%.2f,%.2f]"):format(margin + 8 + 7 * 0.25 + margin, margin + 4 + 3 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin),
 		("list[%s;main;%.2f,%.2f;8,4;]"):format(invloc, margin, margin),
-		("list[current_player;main;%.2f,%.2f;8,1;]"):format(hotbar_x, hotbar_y),
-		("list[current_player;main;%.2f,%.2f;8,3;8]"):format(margin, margin + 4 + 3 * 0.25 + inv_separation + 1 + hotbar_separation),
+		default.get_main_player_inventory_elements(hotbar_x, hotbar_y),
 		("listring[%s;main]"):format(invloc),
 		"listring[current_player;main]",
-		default.get_hotbar_bg(hotbar_x, hotbar_y)
 	})
 	return formspec
 end

@@ -2486,14 +2486,20 @@ minetest.register_node("default:lava_flowing", {
 -- Tools / "Advanced" crafting / Non-"natural"
 --
 
-local bookshelf_formspec =
-	"size[8,7;]" ..
-	"list[context;books;0,0.3;8,2;]" ..
-	"list[current_player;main;0,2.85;8,1;]" ..
-	"list[current_player;main;0,4.08;8,3;8]" ..
-	"listring[context;books]" ..
-	"listring[current_player;main]" ..
-	default.get_hotbar_bg(0,2.85)
+local margin = 0.5
+local inv_separation = 0.75
+local hotbar_separation = 0.5
+
+local hotbar_x, hotbar_y = margin, margin + 2 + 1 * 0.25 + inv_separation
+
+local bookshelf_formspec = table.concat({
+	"formspec_version[4]",
+	("size[%.2f,%.2f]"):format(margin + 8 + 7 * 0.25 + margin, margin + 2 + 1 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin),
+	("list[context;books;%.2f,%.2f;8,4;]"):format(margin, margin),
+	default.get_main_player_inventory_elements(hotbar_x, hotbar_y),
+	"listring[context;books]",
+	"listring[current_player;main]",
+})
 
 local function update_bookshelf(pos)
 	local meta = minetest.get_meta(pos)
@@ -2502,27 +2508,19 @@ local function update_bookshelf(pos)
 
 	local formspec = bookshelf_formspec
 	-- Inventory slots overlay
-	local bx, by = 0, 0.3
 	local n_written, n_empty = 0, 0
-	for i = 1, 16 do
-		if i == 9 then
-			bx = 0
-			by = by + 1
-		end
+	formspec = formspec .. default.get_inventory_icon_bg(margin, margin, 8, 2, "default_bookshelf_slot.png", function(i)
 		local stack = invlist[i]
-		if stack:is_empty() then
-			formspec = formspec ..
-				"image[" .. bx .. "," .. by .. ";1,1;default_bookshelf_slot.png]"
-		else
-			local metatable = stack:get_meta():to_table() or {}
-			if metatable.fields and metatable.fields.text then
+		local skip = not stack:is_empty()
+		if skip then
+			if stack:get_meta():contains("text") then
 				n_written = n_written + stack:get_count()
 			else
 				n_empty = n_empty + stack:get_count()
 			end
 		end
-		bx = bx + 1
-	end
+		return skip
+	end)
 	meta:set_string("formspec", formspec)
 	if n_written + n_empty == 0 then
 		meta:set_string("infotext", S("Empty Bookshelf"))

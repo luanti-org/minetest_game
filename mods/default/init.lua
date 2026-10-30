@@ -51,15 +51,37 @@ function default.get_hotbar_bg(x,y)
 	return table.concat(out)
 end
 
+function default.get_inventory_icon_bg(x, y, width, height, texture, callback)
+	local i = 0
+	local formspec = {}
+	for yo = 0, height - 1 do
+		for xo = 0, width - 1 do
+			i = i + 1
+			if not (callback and callback(i)) then
+				table.insert(formspec, ("image[%.2f,%.2f;1,1;%s]"):format(x + xo * 1.25, y + yo * 1.25, texture))
+			end
+		end
+	end
+	return table.concat(formspec)
+end
+
+local hotbar_separation = 0.5
+
+function default.get_main_player_inventory_elements(x, y)
+	return table.concat({
+		("list[current_player;main;%.2f,%.2f;8,1;]"):format(x, y),
+		("list[current_player;main;%.2f,%.2f;8,3;8]"):format(x, y + 1 + hotbar_separation),
+		default.get_hotbar_bg(x, y),
+	})
+end
+
 default.gui_survival_form = "size[8,8.5]"..
-			"list[current_player;main;0,4.25;8,1;]"..
-			"list[current_player;main;0,5.5;8,3;8]"..
+			default.get_main_player_inventory_elements(0, 4.25),
 			"list[current_player;craft;1.75,0.5;3,3;]"..
 			"list[current_player;craftpreview;5.75,1.5;1,1;]"..
 			"image[4.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
 			"listring[current_player;main]"..
-			"listring[current_player;craft]"..
-			default.get_hotbar_bg(0,4.25)
+			"listring[current_player;craft]"
 
 -- Load files
 local default_path = minetest.get_modpath("default")
