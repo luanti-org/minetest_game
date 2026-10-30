@@ -7,14 +7,20 @@
 local S = minetest.get_translator("vessels")
 
 
-local vessels_shelf_formspec =
-	"size[8,7;]" ..
-	"list[context;vessels;0,0.3;8,2;]" ..
-	"list[current_player;main;0,2.85;8,1;]" ..
-	"list[current_player;main;0,4.08;8,3;8]" ..
-	"listring[context;vessels]" ..
-	"listring[current_player;main]" ..
-	default.get_hotbar_bg(0, 2.85)
+local margin = 0.5
+local inv_separation = 0.75
+local hotbar_separation = 0.5
+
+local hotbar_x, hotbar_y = margin, margin + 2 + 1 * 0.25 + inv_separation
+
+local vessels_shelf_formspec = table.concat({
+	"formspec_version[4]",
+	("size[%.2f,%.2f]"):format(margin + 8 + 7 * 0.25 + margin, margin + 2 + 1 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin),
+	("list[context;vessels;%.2f,%.2f;8,4;]"):format(margin, margin),
+	default.get_main_player_inventory_elements(hotbar_x, hotbar_y),
+	"listring[context;vessels]",
+	"listring[current_player;main]",
+})
 
 local function update_vessels_shelf(pos)
 	local meta = minetest.get_meta(pos)
@@ -23,24 +29,15 @@ local function update_vessels_shelf(pos)
 
 	local formspec = vessels_shelf_formspec
 	-- Inventory slots overlay
-	local vx, vy = 0, 0.3
 	local n_items = 0
-	for i = 1, 16 do
-		if i == 9 then
-			vx = 0
-			vy = vy + 1
-		end
-		if not invlist or invlist[i]:is_empty() then
-			formspec = formspec ..
-				"image[" .. vx .. "," .. vy .. ";1,1;vessels_shelf_slot.png]"
-		else
+	formspec = formspec .. default.get_inventory_icon_bg(margin, margin, 8, 2, "vessels_shelf_slot.png", function(i)
+		local skip = invlist and not invlist[i]:is_empty()
+		if skip then
 			local stack = invlist[i]
-			if not stack:is_empty() then
-				n_items = n_items + stack:get_count()
-			end
+			n_items = n_items + stack:get_count()
 		end
-		vx = vx + 1
-	end
+		return skip
+	end)
 	meta:set_string("formspec", formspec)
 	if n_items == 0 then
 		meta:set_string("infotext", S("Empty Vessels Shelf"))

@@ -3,16 +3,27 @@ default.chest = {}
 -- support for MT game translation.
 local S = default.get_translator
 
+function default.chest.get_nodemeta_inventory_location(pos)
+	return ("nodemeta:%d,%d,%d"):format(pos.x, pos.y, pos.z)
+end
+
+-- formspec parameters
+
+local margin = 0.5
+local inv_separation = 0.75
+local hotbar_separation = 0.5
+
 function default.chest.get_chest_formspec(pos)
-	local spos = pos.x .. "," .. pos.y .. "," .. pos.z
-	local formspec =
-		"size[8,9]" ..
-		"list[nodemeta:" .. spos .. ";main;0,0.3;8,4;]" ..
-		"list[current_player;main;0,4.85;8,1;]" ..
-		"list[current_player;main;0,6.08;8,3;8]" ..
-		"listring[nodemeta:" .. spos .. ";main]" ..
-		"listring[current_player;main]" ..
-		default.get_hotbar_bg(0,4.85)
+	local invloc = default.chest.get_nodemeta_inventory_location(pos)
+	local hotbar_x, hotbar_y = margin, margin + 4 + 3 * 0.25 + inv_separation
+	local formspec = table.concat({
+		"formspec_version[4]",
+		("size[%.2f,%.2f]"):format(margin + 8 + 7 * 0.25 + margin, margin + 4 + 3 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin),
+		("list[%s;main;%.2f,%.2f;8,4;]"):format(invloc, margin, margin),
+		default.get_main_player_inventory_elements(hotbar_x, hotbar_y),
+		("listring[%s;main]"):format(invloc),
+		"listring[current_player;main]",
+	})
 	return formspec
 end
 

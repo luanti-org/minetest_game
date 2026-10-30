@@ -37,14 +37,20 @@ local function drop_contents(pos)
 	minetest.remove_node(pos)
 end
 
-local bones_formspec =
-	"size[8,9]" ..
-	"list[current_name;main;0,0.3;8,4;]" ..
-	"list[current_player;main;0,4.85;8,1;]" ..
-	"list[current_player;main;0,6.08;8,3;8]" ..
-	"listring[current_name;main]" ..
-	"listring[current_player;main]" ..
-	default.get_hotbar_bg(0,4.85)
+local margin = 0.5
+local inv_separation = 0.75
+local hotbar_separation = 0.5
+
+local hotbar_x, hotbar_y = margin, margin + 4 + 3 * 0.25 + inv_separation
+
+local bones_formspec = table.concat({
+	"formspec_version[4]",
+	("size[%.2f,%.2f]"):format(margin + 8 + 7 * 0.25 + margin, margin + 4 + 3 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin),
+	("list[context;main;%.2f,%.2f;8,4;]"):format(margin, margin),
+	default.get_main_player_inventory_elements(hotbar_x, hotbar_y),
+	"listring[context;books]",
+	"listring[current_player;main]",
+})
 
 local share_bones_time = tonumber(minetest.settings:get("share_bones_time")) or 1200
 local share_bones_time_early = tonumber(minetest.settings:get("share_bones_time_early")) or share_bones_time / 4

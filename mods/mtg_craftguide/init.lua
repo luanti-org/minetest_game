@@ -199,6 +199,23 @@ local function item_button_fs(fs, x, y, item, element_name, groups)
 	end
 end
 
+local items_y_span = 4 * 1.25
+local spacing = 0.25
+local filter_width = 3.5
+local lower_bar_height = 1
+local slot_size = 1
+
+local _interval = slot_size + spacing
+
+local select_buttons_x = _interval * 2
+local select_buttons_y = 4
+local select_buttons_fs = table.concat({
+	("image_button[%.2f,%.2f;1,1;craftguide_prev_icon.png;recipe_prev;]"):format(select_buttons_x, select_buttons_y)..
+	("image_button[%.2f,%.2f;1,1;craftguide_next_icon.png;recipe_next;]"):format(select_buttons_x + _interval * 3, select_buttons_y)..
+	"tooltip[recipe_prev;"..esc(S("Previous recipe")).."]"..
+	"tooltip[recipe_next;"..esc(S("Next recipe")).."]"
+})
+
 local function recipe_fs(fs, data)
 	local recipe = data.recipes[data.rnum]
 	local width = recipe.width
@@ -217,16 +234,12 @@ local function recipe_fs(fs, data)
 		end
 	end
 
-	table.insert(fs, ("label[5.5,1;%s]"):format(esc(data.show_usages
+	table.insert(fs, ("label[%.2f,%.2f;%s]"):format(select_buttons_x + _interval + 0.35, select_buttons_y + slot_size * 0.5, esc(data.show_usages
 		and S("Usage @1 of @2", data.rnum, #data.recipes)
 		or S("Recipe @1 of @2", data.rnum, #data.recipes))))
 
 	if #data.recipes > 1 then
-		table.insert(fs,
-			"image_button[5.5,1.6;0.8,0.8;craftguide_prev_icon.png;recipe_prev;]"..
-			"image_button[6.2,1.6;0.8,0.8;craftguide_next_icon.png;recipe_next;]"..
-			"tooltip[recipe_prev;"..esc(S("Previous recipe")).."]"..
-			"tooltip[recipe_next;"..esc(S("Next recipe")).."]")
+		table.insert(fs, select_buttons_fs)
 	end
 
 	local rows = math.ceil(table.maxn(recipe.items) / width)
@@ -236,8 +249,8 @@ local function recipe_fs(fs, data)
 		return
 	end
 
-	local base_x = 3 - width
-	local base_y = rows == 1 and 1 or 0
+	local base_x = (3 - width) * _interval
+	local base_y = rows == 1 and 1.25 or 0
 
 	for i, item in pairs(recipe.items) do
 		local x, y = coords(i - 1, width)
@@ -248,7 +261,7 @@ local function recipe_fs(fs, data)
 			item = groups_to_item(groups)
 			elem_name = esc(item.."."..table.concat(groups, "+"))
 		end
-		item_button_fs(fs, base_x + x, base_y + y, item, elem_name, groups)
+		item_button_fs(fs, base_x + x * _interval, base_y + y * _interval, item, elem_name, groups)
 	end
 
 	if shapeless or recipe.method == "cooking" then
@@ -258,9 +271,27 @@ local function recipe_fs(fs, data)
 			S("Cooking time: @1", minetest.colorize("yellow", cooktime))
 		table.insert(fs, "tooltip[3.2,0.5;0.5,0.5;"..esc(tooltip).."]")
 	end
-	table.insert(fs, "image[3,1;1,1;sfinv_crafting_arrow.png]")
+	table.insert(fs, ("image[%.2f,%.2f;1,1;sfinv_crafting_arrow.png]"):format(_interval * 3, _interval))
 
-	item_button_fs(fs, 4, 1, recipe.output, recipe.output:match("%S*"))
+	item_button_fs(fs, _interval * 4, _interval, recipe.output, recipe.output:match("%S*"))
+end
+
+local base_formspec
+do
+	local _paginate_x = filter_width + spacing + (slot_size + spacing) * 2
+	base_formspec = table.concat({
+		"style_type[item_image_button;padding=2]",
+		("image_button[%.2f,%.2f;1,1;craftguide_prev_icon.png;prev;]"):format(_paginate_x, items_y_span),
+		("image_button[%.2f,%.2f;1,1;craftguide_next_icon.png;next;]"):format(_paginate_x + (slot_size + spacing) * 2, items_y_span),
+		("image_button[%.2f,%.2f;1,1;craftguide_search_icon.png;search;]"):format(filter_width + spacing, items_y_span),
+		("image_button[%.2f,%.2f;1,1;craftguide_clear_icon.png;clear;]"):format(filter_width + spacing + slot_size + spacing, items_y_span),
+		("tooltip[search;%s]"):format(esc(S("Search"))),
+		("tooltip[clear;%s]"):format(esc(S("Reset"))),
+		("tooltip[prev;%s]"):format(esc(S("Previous page"))),
+		("tooltip[next;%s]"):format(esc(S("Next page"))),
+		"field_enter_after_edit[filter;true]",
+		"field_close_on_enter[filter;false]"
+	})
 end
 
 local function get_formspec(player)
@@ -268,22 +299,14 @@ local function get_formspec(player)
 	local data = player_data[name]
 	data.pagemax = math.max(1, math.ceil(#data.items / 32))
 
-	local fs = {}
-	table.insert(fs,
-		"style_type[item_image_button;padding=2]"..
-		"field[0.3,4.2;2.8,1.2;filter;;"..esc(data.filter).."]"..
-		"label[5.8,4.15;"..minetest.colorize("yellow", data.pagenum).." / "..
-			data.pagemax.."]"..
-		"image_button[2.63,4.05;0.8,0.8;craftguide_search_icon.png;search;]"..
-		"image_button[3.25,4.05;0.8,0.8;craftguide_clear_icon.png;clear;]"..
-		"image_button[5,4.05;0.8,0.8;craftguide_prev_icon.png;prev;]"..
-		"image_button[7.25,4.05;0.8,0.8;craftguide_next_icon.png;next;]"..
-		"tooltip[search;"..esc(S("Search")).."]"..
-		"tooltip[clear;"..esc(S("Reset")).."]"..
-		"tooltip[prev;"..esc(S("Previous page")).."]"..
-		"tooltip[next;"..esc(S("Next page")).."]"..
-		"field_enter_after_edit[filter;true]"..
-		"field_close_on_enter[filter;false]")
+	local fs = {
+		base_formspec,
+		("field[%.2f,%.2f;%.2f,%.2f;filter;;%s]"):format(0, items_y_span, filter_width, lower_bar_height, esc(data.filter)),
+		("label[%.2f,%.2f;%s / %d]"):format(
+			filter_width + (spacing + slot_size) * 3 + spacing + 0.2, items_y_span + 0.5,
+			core.colorize("yellow", tostring(data.pagenum)), data.pagemax
+		),
+	}
 
 	if #data.items == 0 then
 		table.insert(fs, "label[3,2;"..esc(S("No items to show.")).."]")
@@ -295,11 +318,11 @@ local function get_formspec(player)
 				break
 			end
 			local x, y = coords(i % 32, 8)
-			item_button_fs(fs, x, y, item, item)
+			item_button_fs(fs, x * _interval, y * _interval, item, item)
 		end
 	end
 
-	table.insert(fs, "container[0,5.6]")
+	table.insert(fs, ("container[0,%.2f]"):format(items_y_span + lower_bar_height + 0.75))
 	if data.recipes then
 		recipe_fs(fs, data)
 	elseif data.prev_item then

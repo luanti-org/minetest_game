@@ -36,27 +36,45 @@ function sfinv.get_nav_fs(player, context, nav, current_idx)
 	end
 end
 
-local theme_inv = [[
-		image[0,5.2;1,1;gui_hb_bg.png]
-		image[1,5.2;1,1;gui_hb_bg.png]
-		image[2,5.2;1,1;gui_hb_bg.png]
-		image[3,5.2;1,1;gui_hb_bg.png]
-		image[4,5.2;1,1;gui_hb_bg.png]
-		image[5,5.2;1,1;gui_hb_bg.png]
-		image[6,5.2;1,1;gui_hb_bg.png]
-		image[7,5.2;1,1;gui_hb_bg.png]
-		list[current_player;main;0,5.2;8,1;]
-		list[current_player;main;0,6.35;8,3;8]
-	]]
+local margin = 0.5
+local slot_size = 1
+local slot_spacing = 0.25
+
+local hotbar_gap = 0.5
+
+local _slot_interval = slot_size + slot_spacing
+
+local frame_height = _slot_interval * 5 - slot_spacing
+local frame_gap = 0.75
+
+local _size_x = margin + _slot_interval * 8 - slot_spacing + margin
+local _size_y = margin + frame_height + frame_gap + slot_size + hotbar_gap + _slot_interval * 3 - slot_spacing + margin
+
+local theme_inv
+do
+	local t = {}
+	for i=0, 7 do
+		t[i+1] = ("image[%.2f,%.2f;%.2f,%.2f;gui_hb_bg.png]"):format(i * _slot_interval, 0, slot_size, slot_size)
+	end
+	t[8] = ("list[current_player;main;%.2f,%.2f;8,1;]"):format(0, 0)
+	t[9] = ("list[current_player;main;%.2f,%.2f;8,3;8]"):format(0, slot_size + hotbar_gap)
+	theme_inv = table.concat(t)
+end
 
 function sfinv.make_formspec(player, context, content, show_inv, size)
-	local tmp = {
-		size or "size[8,9.1]",
+	return table.concat({
+		"formspec_version[4]",
+		size or ("size[%.2f,%.2f]"):format(_size_x, _size_y),
 		sfinv.get_nav_fs(player, context, context.nav_titles, context.nav_idx),
-		show_inv and theme_inv or "",
-		content
-	}
-	return table.concat(tmp, "")
+		show_inv and (
+			("container[%.2f,%.2f]"):format(margin, margin + frame_height + frame_gap) ..
+			theme_inv ..
+			"container_end[]"
+		) or "",
+		("container[%.2f,%.2f]"):format(margin, margin),
+		content,
+		"container_end[]",
+	})
 end
 
 function sfinv.get_homepage_name(player)

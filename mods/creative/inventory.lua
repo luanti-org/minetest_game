@@ -144,6 +144,35 @@ trash:set_size("main", 1)
 
 creative.formspec_add = ""
 
+local items_y_span = 4 * 1.25
+local spacing = 0.25
+local filter_width = 2.25
+local lower_bar_height = 1
+local button_width = 1
+
+local base_formspec
+do
+	local esc = core.formspec_escape
+	local _trash_x = filter_width + spacing + button_width + spacing + button_width + spacing
+	base_formspec = table.concat({
+		("image[%.2f,%.2f;0.8,0.8;creative_trash_icon.png]"):format(_trash_x + 0.1, items_y_span + 0.1),
+		"listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]",
+		("list[detached:trash;main;%.2f,%.2f;1,1;]"):format(_trash_x, items_y_span),
+		"listring[]",
+		("image_button[%.2f,%.2f;1,1;creative_prev_icon.png;creative_prev;]"):format(_trash_x + button_width + spacing, items_y_span),
+		("image_button[%.2f,%.2f;1,1;creative_next_icon.png;creative_next;]"):format(_trash_x + (button_width + spacing) * 3, items_y_span),
+		("image_button[%.2f,%.2f;1,1;creative_search_icon.png;creative_search;]"):format(filter_width + spacing, items_y_span),
+		("image_button[%.2f,%.2f;1,1;creative_clear_icon.png;creative_clear;]"):format(filter_width + spacing + button_width + spacing, items_y_span),
+		("tooltip[creative_search;%s]"):format(esc(S("Search"))),
+		("tooltip[creative_clear;%s]"):format(esc(S("Reset"))),
+		("tooltip[creative_prev;%s]"):format(esc(S("Previous page"))),
+		("tooltip[creative_next;%s]"):format(esc(S("Next page"))),
+		"listring[current_player;main]",
+		"field_enter_after_edit[creative_filter;true]",
+		"field_close_on_enter[creative_filter;false]"
+	})
+end
+
 function creative.register_tab(name, title, items)
 	sfinv.register_page("creative:" .. name, {
 		title = title,
@@ -156,31 +185,19 @@ function creative.register_tab(name, title, items)
 			local inv = player_inventory[player_name]
 			local pagenum = math.floor(inv.start_i / (4*8) + 1)
 			local pagemax = math.max(math.ceil(inv.size / (4*8)), 1)
-			local esc = minetest.formspec_escape
-			return sfinv.make_formspec(player, context,
-				(inv.size == 0 and ("label[3,2;"..esc(S("No items to show.")).."]") or "") ..
-				"label[5.8,4.15;" .. minetest.colorize("#FFFF00", tostring(pagenum)) .. " / " .. tostring(pagemax) .. "]" ..
-				[[
-					image[4.08,4.2;0.8,0.8;creative_trash_icon.png]
-					listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]
-					list[detached:trash;main;4.02,4.1;1,1;]
-					listring[]
-					image_button[5,4.05;0.8,0.8;creative_prev_icon.png;creative_prev;]
-					image_button[7.25,4.05;0.8,0.8;creative_next_icon.png;creative_next;]
-					image_button[2.63,4.05;0.8,0.8;creative_search_icon.png;creative_search;]
-					image_button[3.25,4.05;0.8,0.8;creative_clear_icon.png;creative_clear;]
-				]] ..
-				"tooltip[creative_search;" .. esc(S("Search")) .. "]" ..
-				"tooltip[creative_clear;" .. esc(S("Reset")) .. "]" ..
-				"tooltip[creative_prev;" .. esc(S("Previous page")) .. "]" ..
-				"tooltip[creative_next;" .. esc(S("Next page")) .. "]" ..
-				"listring[current_player;main]" ..
-				"field_enter_after_edit[creative_filter;true]" ..
-				"field_close_on_enter[creative_filter;false]" ..
-				"field[0.3,4.2;2.8,1.2;creative_filter;;" .. esc(inv.filter) .. "]" ..
-				"listring[detached:creative_" .. player_name .. ";main]" ..
-				"list[detached:creative_" .. player_name .. ";main;0,0;8,4;" .. tostring(inv.start_i) .. "]" ..
-				creative.formspec_add, true)
+			local esc = core.formspec_escape
+			return sfinv.make_formspec(player, context, table.concat({
+				base_formspec,
+				(inv.size == 0 and ("label[3,2;%s]"):format(esc(S("No items to show."))) or ""),
+				("label[%.2f,%.2f;%s / %d]"):format(
+					filter_width + (spacing + button_width) * 4 + spacing + 0.2, items_y_span + 0.5,
+					core.colorize("#FFFF00", tostring(pagenum)), pagemax
+				),
+				("field[%.2f,%.2f;%.2f,%.2f;creative_filter;;%s]"):format(0, items_y_span, filter_width, lower_bar_height, esc(inv.filter)),
+				("listring[detached:creative_%s;main]"):format(player_name),
+				("list[detached:creative_%s;main;0,0;8,4;%d]"):format(player_name, inv.start_i),
+				creative.formspec_add
+			}), true)
 		end,
 		on_enter = function(self, player, context)
 			local player_name = player:get_player_name()
