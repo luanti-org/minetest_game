@@ -1,10 +1,10 @@
 -- butterflies/init.lua
 
 -- Load support for MT game translation.
-local S = minetest.get_translator("butterflies")
+local S = core.get_translator("butterflies")
 
 -- Legacy compatibility, when pointabilities don't exist, pointable is set to true.
-local pointable_compat = not minetest.features.item_specific_pointabilities
+local pointable_compat = not core.features.item_specific_pointabilities
 
 -- register butterflies
 local butter_list = {
@@ -17,7 +17,7 @@ for i in ipairs (butter_list) do
 	local name = butter_list[i][1]
 	local desc = butter_list[i][2]
 
-	minetest.register_node("butterflies:butterfly_"..name, {
+	core.register_node("butterflies:butterfly_"..name, {
 		description = desc,
 		drawtype = "plantlike",
 		tiles = {{
@@ -44,17 +44,17 @@ for i in ipairs (butter_list) do
 		},
 		floodable = true,
 		on_construct = function(pos)
-			minetest.get_node_timer(pos):start(1)
+			core.get_node_timer(pos):start(1)
 		end,
 		on_timer = function(pos, elapsed)
-			if minetest.get_node_light(pos) < 11 then
-				minetest.set_node(pos, {name = "butterflies:hidden_butterfly_"..name})
+			if core.get_node_light(pos) < 11 then
+				core.set_node(pos, {name = "butterflies:hidden_butterfly_"..name})
 			end
-			minetest.get_node_timer(pos):start(30)
+			core.get_node_timer(pos):start(30)
 		end
 	})
 
-	minetest.register_node("butterflies:hidden_butterfly_"..name, {
+	core.register_node("butterflies:hidden_butterfly_"..name, {
 		drawtype = "airlike",
 		inventory_image = "butterflies_butterfly_"..name..".png^default_invisible_node_overlay.png",
 		wield_image =  "butterflies_butterfly_"..name..".png^default_invisible_node_overlay.png",
@@ -67,19 +67,19 @@ for i in ipairs (butter_list) do
 		groups = {not_in_creative_inventory = 1},
 		floodable = true,
 		on_construct = function(pos)
-			minetest.get_node_timer(pos):start(1)
+			core.get_node_timer(pos):start(1)
 		end,
 		on_timer = function(pos, elapsed)
-			if minetest.get_node_light(pos) >= 11 then
-				minetest.set_node(pos, {name = "butterflies:butterfly_"..name})
+			if core.get_node_light(pos) >= 11 then
+				core.set_node(pos, {name = "butterflies:butterfly_"..name})
 			end
-			minetest.get_node_timer(pos):start(30)
+			core.get_node_timer(pos):start(30)
 		end
 	})
 end
 
 -- register decoration
-minetest.register_decoration({
+core.register_decoration({
 	name = "butterflies:butterfly",
 	deco_type = "simple",
 	place_on = {"default:dirt_with_grass"},
@@ -99,12 +99,12 @@ minetest.register_decoration({
 })
 
 -- get decoration ID
-local butterflies = minetest.get_decoration_id("butterflies:butterfly")
-minetest.set_gen_notify({decoration = true}, {butterflies})
+local butterflies = core.get_decoration_id("butterflies:butterfly")
+core.set_gen_notify({decoration = true}, {butterflies})
 
 -- start nodetimers
-minetest.register_on_generated(function(minp, maxp, blockseed)
-	local gennotify = minetest.get_mapgen_object("gennotify")
+core.register_on_generated(function(minp, maxp, blockseed)
+	local gennotify = core.get_mapgen_object("gennotify")
 	local poslist = {}
 
 	for _, pos in ipairs(gennotify["decoration#"..butterflies] or {}) do
@@ -115,7 +115,7 @@ minetest.register_on_generated(function(minp, maxp, blockseed)
 	if #poslist ~= 0 then
 		for i = 1, #poslist do
 			local pos = poslist[i]
-			minetest.get_node_timer(pos):start(1)
+			core.get_node_timer(pos):start(1)
 		end
 	end
 end)

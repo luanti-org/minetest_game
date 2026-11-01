@@ -30,10 +30,10 @@ function creative.init_creative_inventory(player)
 		old_content = nil
 	}
 
-	minetest.create_detached_inventory("creative_" .. player_name, {
+	core.create_detached_inventory("creative_" .. player_name, {
 		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player2)
 			local name = player2 and player2:get_player_name() or ""
-			if not minetest.is_creative_enabled(name) or
+			if not core.is_creative_enabled(name) or
 					to_list == "main" then
 				return 0
 			end
@@ -44,7 +44,7 @@ function creative.init_creative_inventory(player)
 		end,
 		allow_take = function(inv, listname, index, stack, player2)
 			local name = player2 and player2:get_player_name() or ""
-			if not minetest.is_creative_enabled(name) then
+			if not core.is_creative_enabled(name) then
 				return 0
 			end
 			return -1
@@ -53,7 +53,7 @@ function creative.init_creative_inventory(player)
 		end,
 		on_take = function(inv, listname, index, stack, player2)
 			if stack and stack:get_count() > 0 then
-				minetest.log("action", player_name .. " takes " .. stack:get_name().. " from creative inventory")
+				core.log("action", player_name .. " takes " .. stack:get_name().. " from creative inventory")
 			end
 		end,
 	}, player_name)
@@ -75,15 +75,15 @@ end
 local function description(def, lang_code)
 	local s = def.description
 	if lang_code then
-		s = minetest.get_translated_string(lang_code, s)
+		s = core.get_translated_string(lang_code, s)
 	end
 	return s:gsub("\n.*", "") -- First line only
 end
 
 function creative.update_creative_inventory(player_name, tab_content)
 	local inv = player_inventory[player_name] or
-			creative.init_creative_inventory(minetest.get_player_by_name(player_name))
-	local player_inv = minetest.get_inventory({type = "detached", name = "creative_" .. player_name})
+			creative.init_creative_inventory(core.get_player_by_name(player_name))
+	local player_inv = core.get_inventory({type = "detached", name = "creative_" .. player_name})
 
 	if inv.filter == inv.old_filter and tab_content == inv.old_content then
 		return
@@ -94,7 +94,7 @@ function creative.update_creative_inventory(player_name, tab_content)
 	local items = inventory_cache[tab_content] or init_creative_cache(tab_content)
 
 	local lang
-	local player_info = minetest.get_player_information(player_name)
+	local player_info = core.get_player_information(player_name)
 	if player_info and player_info.lang_code ~= "" then
 		lang = player_info.lang_code
 	end
@@ -124,13 +124,13 @@ function creative.update_creative_inventory(player_name, tab_content)
 	inv.size = #creative_list
 end
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	local name = player:get_player_name()
 	player_inventory[name] = nil
 end)
 
 -- Create the trash field
-local trash = minetest.create_detached_inventory("trash", {
+local trash = core.create_detached_inventory("trash", {
 	-- Allow the stack to be placed and remove it in on_put()
 	-- This allows the creative inventory to restore the stack
 	allow_put = function(inv, listname, index, stack, player)
@@ -148,7 +148,7 @@ function creative.register_tab(name, title, items)
 	sfinv.register_page("creative:" .. name, {
 		title = title,
 		is_in_nav = function(self, player, context)
-			return minetest.is_creative_enabled(player:get_player_name())
+			return core.is_creative_enabled(player:get_player_name())
 		end,
 		get = function(self, player, context)
 			local player_name = player:get_player_name()
@@ -156,10 +156,10 @@ function creative.register_tab(name, title, items)
 			local inv = player_inventory[player_name]
 			local pagenum = math.floor(inv.start_i / (4*8) + 1)
 			local pagemax = math.max(math.ceil(inv.size / (4*8)), 1)
-			local esc = minetest.formspec_escape
+			local esc = core.formspec_escape
 			return sfinv.make_formspec(player, context,
 				(inv.size == 0 and ("label[3,2;"..esc(S("No items to show.")).."]") or "") ..
-				"label[5.8,4.15;" .. minetest.colorize("#FFFF00", tostring(pagenum)) .. " / " .. tostring(pagemax) .. "]" ..
+				"label[5.8,4.15;" .. core.colorize("#FFFF00", tostring(pagenum)) .. " / " .. tostring(pagemax) .. "]" ..
 				[[
 					image[4.08,4.2;0.8,0.8;creative_trash_icon.png]
 					listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]
@@ -236,29 +236,29 @@ local registered_nodes = {}
 local registered_tools = {}
 local registered_craftitems = {}
 
-minetest.register_on_mods_loaded(function()
-	for name, def in pairs(minetest.registered_items) do
+core.register_on_mods_loaded(function()
+	for name, def in pairs(core.registered_items) do
 		local group = def.groups or {}
 
 		local nogroup = not (group.node or group.tool or group.craftitem)
-		if group.node or (nogroup and minetest.registered_nodes[name]) then
+		if group.node or (nogroup and core.registered_nodes[name]) then
 			registered_nodes[name] = def
-		elseif group.tool or (nogroup and minetest.registered_tools[name]) then
+		elseif group.tool or (nogroup and core.registered_tools[name]) then
 			registered_tools[name] = def
-		elseif group.craftitem or (nogroup and minetest.registered_craftitems[name]) then
+		elseif group.craftitem or (nogroup and core.registered_craftitems[name]) then
 			registered_craftitems[name] = def
 		end
 	end
 end)
 
-creative.register_tab("all", S("All"), minetest.registered_items)
+creative.register_tab("all", S("All"), core.registered_items)
 creative.register_tab("nodes", S("Nodes"), registered_nodes)
 creative.register_tab("tools", S("Tools"), registered_tools)
 creative.register_tab("craftitems", S("Items"), registered_craftitems)
 
 local old_homepage_name = sfinv.get_homepage_name
 function sfinv.get_homepage_name(player)
-	if minetest.is_creative_enabled(player:get_player_name()) then
+	if core.is_creative_enabled(player:get_player_name()) then
 		return "creative:all"
 	else
 		return old_homepage_name(player)

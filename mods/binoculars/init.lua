@@ -5,7 +5,7 @@
 binoculars = {}
 
 -- Load support for MT game translation.
-local S = minetest.get_translator("binoculars")
+local S = core.get_translator("binoculars")
 
 
 -- Update player property
@@ -17,7 +17,7 @@ function binoculars.update_player_property(player)
 	if player:get_inventory():contains_item(
 			"main", "binoculars:binoculars") then
 		new_zoom_fov = 10
-	elseif minetest.is_creative_enabled(player:get_player_name()) then
+	elseif core.is_creative_enabled(player:get_player_name()) then
 		new_zoom_fov = 15
 	end
 
@@ -30,7 +30,7 @@ end
 
 -- Set player property 'on joinplayer'
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	binoculars.update_player_property(player)
 end)
 
@@ -38,18 +38,18 @@ end)
 -- Cyclic update of player property
 
 local function cyclic_update()
-	for _, player in ipairs(minetest.get_connected_players()) do
+	for _, player in ipairs(core.get_connected_players()) do
 		binoculars.update_player_property(player)
 	end
-	minetest.after(4.7, cyclic_update)
+	core.after(4.7, cyclic_update)
 end
 
-minetest.after(4.7, cyclic_update)
+core.after(4.7, cyclic_update)
 
 
 -- Binoculars item
 
-minetest.register_craftitem("binoculars:binoculars", {
+core.register_craftitem("binoculars:binoculars", {
 	description = S("Binoculars") .. "\n" .. S("Use with 'Zoom' key"),
 	inventory_image = "binoculars_binoculars.png",
 	stack_max = 1,
@@ -63,7 +63,7 @@ minetest.register_craftitem("binoculars:binoculars", {
 
 -- Crafting
 
-minetest.register_craft({
+core.register_craft({
 	output = "binoculars:binoculars",
 	recipe = {
 		{"default:obsidian_glass", "", "default:obsidian_glass"},

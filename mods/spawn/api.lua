@@ -19,8 +19,8 @@ end
 
 -- Logic run on spawn
 
-local use_engine_spawn = minetest.settings:get("static_spawnpoint") or
-		minetest.settings:get_bool("engine_spawn")
+local use_engine_spawn = core.settings:get("static_spawnpoint") or
+		core.settings:get_bool("engine_spawn")
 
 local function on_spawn(player, is_new)
 	-- Ask all callbacks first
@@ -40,10 +40,10 @@ local function on_spawn(player, is_new)
 	return false
 end
 
-minetest.register_on_newplayer(function(player)
+core.register_on_newplayer(function(player)
 	on_spawn(player, true)
 end)
 
-minetest.register_on_respawnplayer(function(player)
+core.register_on_respawnplayer(function(player)
 	return on_spawn(player, false)
 end)

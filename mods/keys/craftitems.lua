@@ -1,11 +1,11 @@
 -- Load support for MT game translation.
-local S = minetest.get_translator("keys")
+local S = core.get_translator("keys")
 
 --
 -- Craftitems
 --
 
-minetest.register_craftitem("keys:skeleton_key", {
+core.register_craftitem("keys:skeleton_key", {
 	description = S("Skeleton Key"),
 	inventory_image = "keys_key_skeleton.png",
 	on_use = function(itemstack, user, pointed_thing)
@@ -14,13 +14,13 @@ minetest.register_craftitem("keys:skeleton_key", {
 		end
 
 		local pos = pointed_thing.under
-		local node = minetest.get_node(pos)
+		local node = core.get_node(pos)
 
 		if not node then
 			return itemstack
 		end
 
-		local node_reg = minetest.registered_nodes[node.name]
+		local node_reg = core.registered_nodes[node.name]
 		local on_skeleton_key_use = node_reg and node_reg.on_skeleton_key_use
 		if not on_skeleton_key_use then
 			return itemstack
@@ -36,7 +36,7 @@ minetest.register_craftitem("keys:skeleton_key", {
 		local secret, _, _ = on_skeleton_key_use(pos, user, newsecret)
 
 		if secret then
-			local inv = minetest.get_inventory({type="player", name=user:get_player_name()})
+			local inv = core.get_inventory({type="player", name=user:get_player_name()})
 
 			-- update original itemstack
 			itemstack:take_item()
@@ -46,13 +46,13 @@ minetest.register_craftitem("keys:skeleton_key", {
 			local meta = new_stack:get_meta()
 			meta:set_string("secret", secret)
 			meta:set_string("description", S("Key to @1's @2", user:get_player_name(),
-				minetest.registered_nodes[node.name].description))
+				core.registered_nodes[node.name].description))
 
 			if itemstack:get_count() == 0 then
 				itemstack = new_stack
 			else
 				if inv:add_item("main", new_stack):get_count() > 0 then
-					minetest.add_item(user:get_pos(), new_stack)
+					core.add_item(user:get_pos(), new_stack)
 				end -- else: added to inventory successfully
 			end
 
@@ -61,14 +61,14 @@ minetest.register_craftitem("keys:skeleton_key", {
 	end
 })
 
-minetest.register_craftitem("keys:key", {
+core.register_craftitem("keys:key", {
 	description = S("Key"),
 	inventory_image = "keys_key.png",
 	groups = {key = 1, not_in_creative_inventory = 1},
 	on_place = function(itemstack, placer, pointed_thing)
 		local under = pointed_thing.under
-		local node = minetest.get_node(under)
-		local def = minetest.registered_nodes[node.name]
+		local node = core.get_node(under)
+		local def = core.registered_nodes[node.name]
 		if def and def.on_rightclick and
 				not (placer and placer:is_player() and
 				placer:get_player_control().sneak) then
@@ -80,13 +80,13 @@ minetest.register_craftitem("keys:key", {
 		end
 
 		local pos = pointed_thing.under
-		node = minetest.get_node(pos)
+		node = core.get_node(pos)
 
 		if not node or node.name == "ignore" then
 			return itemstack
 		end
 
-		local ndef = minetest.registered_nodes[node.name]
+		local ndef = core.registered_nodes[node.name]
 		if not ndef then
 			return itemstack
 		end

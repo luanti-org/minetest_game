@@ -90,7 +90,7 @@ function sfinv.get_formspec(player, context)
 		local home_page = sfinv.get_homepage_name(player)
 
 		if old_page == home_page then
-			minetest.log("error", "[sfinv] Couldn't find " .. dump(old_page) ..
+			core.log("error", "[sfinv] Couldn't find " .. dump(old_page) ..
 					", which is also the old page")
 
 			return ""
@@ -98,7 +98,7 @@ function sfinv.get_formspec(player, context)
 
 		context.page = home_page
 		assert(sfinv.pages[context.page], "[sfinv] Invalid homepage")
-		minetest.log("warning", "[sfinv] Couldn't find " .. dump(old_page) ..
+		core.log("warning", "[sfinv] Couldn't find " .. dump(old_page) ..
 				" so switching to homepage")
 
 		return sfinv.get_formspec(player, context)
@@ -146,17 +146,17 @@ function sfinv.get_page(player)
 	return context and context.page or sfinv.get_homepage_name(player)
 end
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	if sfinv.enabled then
 		sfinv.set_player_inventory_formspec(player)
 	end
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	sfinv.contexts[player:get_player_name()] = nil
 end)
 
-minetest.register_on_player_receive_fields(function(player, formname, fields)
+core.register_on_player_receive_fields(function(player, formname, fields)
 	if formname ~= "" or not sfinv.enabled then
 		return false
 	end

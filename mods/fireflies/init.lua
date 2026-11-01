@@ -1,12 +1,12 @@
 -- firefly/init.lua
 
 -- Load support for MT game translation.
-local S = minetest.get_translator("fireflies")
+local S = core.get_translator("fireflies")
 
 -- Legacy compatibility, when pointabilities don't exist, pointable is set to true.
-local pointable_compat = not minetest.features.item_specific_pointabilities
+local pointable_compat = not core.features.item_specific_pointabilities
 
-minetest.register_node("fireflies:firefly", {
+core.register_node("fireflies:firefly", {
 	description = S("Firefly"),
 	drawtype = "plantlike",
 	tiles = {{
@@ -34,17 +34,17 @@ minetest.register_node("fireflies:firefly", {
 	light_source = 6,
 	floodable = true,
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(1)
+		core.get_node_timer(pos):start(1)
 	end,
 	on_timer = function(pos, elapsed)
-		if minetest.get_node_light(pos) > 11 then
-			minetest.set_node(pos, {name = "fireflies:hidden_firefly"})
+		if core.get_node_light(pos) > 11 then
+			core.set_node(pos, {name = "fireflies:hidden_firefly"})
 		end
-		minetest.get_node_timer(pos):start(30)
+		core.get_node_timer(pos):start(30)
 	end
 })
 
-minetest.register_node("fireflies:hidden_firefly", {
+core.register_node("fireflies:hidden_firefly", {
 	description = S("Hidden Firefly"),
 	drawtype = "airlike",
 	inventory_image = "fireflies_firefly.png^default_invisible_node_overlay.png",
@@ -59,19 +59,19 @@ minetest.register_node("fireflies:hidden_firefly", {
 	groups = {not_in_creative_inventory = 1},
 	floodable = true,
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(1)
+		core.get_node_timer(pos):start(1)
 	end,
 	on_timer = function(pos, elapsed)
-		if minetest.get_node_light(pos) <= 11 then
-			minetest.set_node(pos, {name = "fireflies:firefly"})
+		if core.get_node_light(pos) <= 11 then
+			core.set_node(pos, {name = "fireflies:firefly"})
 		end
-		minetest.get_node_timer(pos):start(30)
+		core.get_node_timer(pos):start(30)
 	end
 })
 
 
 -- bug net
-minetest.register_tool("fireflies:bug_net", {
+core.register_tool("fireflies:bug_net", {
 	description = S("Bug Net"),
 	inventory_image = "fireflies_bugnet.png",
 	pointabilities = {nodes = {["group:catchable"] = true}},
@@ -82,7 +82,7 @@ minetest.register_tool("fireflies:bug_net", {
 	},
 })
 
-minetest.register_craft( {
+core.register_craft( {
 	output = "fireflies:bug_net",
 	recipe = {
 		{"farming:string", "farming:string"},
@@ -93,7 +93,7 @@ minetest.register_craft( {
 
 
 -- firefly in a bottle
-minetest.register_node("fireflies:firefly_bottle", {
+core.register_node("fireflies:firefly_bottle", {
 	description = S("Firefly in a Bottle"),
 	inventory_image = "fireflies_bottle.png",
 	wield_image = "fireflies_bottle.png",
@@ -119,30 +119,30 @@ minetest.register_node("fireflies:firefly_bottle", {
 	sounds = default.node_sound_glass_defaults(),
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		local lower_pos = {x = pos.x, y = pos.y + 1, z = pos.z}
-		if minetest.is_protected(pos, player:get_player_name()) or
-				minetest.get_node(lower_pos).name ~= "air" then
+		if core.is_protected(pos, player:get_player_name()) or
+				core.get_node(lower_pos).name ~= "air" then
 			return
 		end
 
 		local upper_pos = {x = pos.x, y = pos.y + 2, z = pos.z}
 		local firefly_pos
 
-		if not minetest.is_protected(upper_pos, player:get_player_name()) and
-				minetest.get_node(upper_pos).name == "air" then
+		if not core.is_protected(upper_pos, player:get_player_name()) and
+				core.get_node(upper_pos).name == "air" then
 			firefly_pos = upper_pos
-		elseif not minetest.is_protected(lower_pos, player:get_player_name()) then
+		elseif not core.is_protected(lower_pos, player:get_player_name()) then
 			firefly_pos = lower_pos
 		end
 
 		if firefly_pos then
-			minetest.set_node(pos, {name = "vessels:glass_bottle"})
-			minetest.set_node(firefly_pos, {name = "fireflies:firefly"})
-			minetest.get_node_timer(firefly_pos):start(1)
+			core.set_node(pos, {name = "vessels:glass_bottle"})
+			core.set_node(firefly_pos, {name = "fireflies:firefly"})
+			core.get_node_timer(firefly_pos):start(1)
 		end
 	end
 })
 
-minetest.register_craft( {
+core.register_craft( {
 	output = "fireflies:firefly_bottle",
 	recipe = {
 		{"fireflies:firefly"},
@@ -153,9 +153,9 @@ minetest.register_craft( {
 
 -- register fireflies as decorations
 
-if minetest.get_mapgen_setting("mg_name") == "v6" then
+if core.get_mapgen_setting("mg_name") == "v6" then
 
-	minetest.register_decoration({
+	core.register_decoration({
 		name = "fireflies:firefly_low",
 		deco_type = "simple",
 		place_on = "default:dirt_with_grass",
@@ -167,7 +167,7 @@ if minetest.get_mapgen_setting("mg_name") == "v6" then
 		decoration = "fireflies:hidden_firefly",
 	})
 
-	minetest.register_decoration({
+	core.register_decoration({
 		name = "fireflies:firefly_high",
 		deco_type = "simple",
 		place_on = "default:dirt_with_grass",
@@ -181,7 +181,7 @@ if minetest.get_mapgen_setting("mg_name") == "v6" then
 
 else
 
-	minetest.register_decoration({
+	core.register_decoration({
 		name = "fireflies:firefly_low",
 		deco_type = "simple",
 		place_on = {
@@ -204,7 +204,7 @@ else
 		decoration = "fireflies:hidden_firefly",
 	})
 
-	minetest.register_decoration({
+	core.register_decoration({
 		name = "fireflies:firefly_high",
 		deco_type = "simple",
 		place_on = {
@@ -231,14 +231,14 @@ end
 
 
 -- get decoration IDs
-local firefly_low = minetest.get_decoration_id("fireflies:firefly_low")
-local firefly_high = minetest.get_decoration_id("fireflies:firefly_high")
+local firefly_low = core.get_decoration_id("fireflies:firefly_low")
+local firefly_high = core.get_decoration_id("fireflies:firefly_high")
 
-minetest.set_gen_notify({decoration = true}, {firefly_low, firefly_high})
+core.set_gen_notify({decoration = true}, {firefly_low, firefly_high})
 
 -- start nodetimers
-minetest.register_on_generated(function(minp, maxp, blockseed)
-	local gennotify = minetest.get_mapgen_object("gennotify")
+core.register_on_generated(function(minp, maxp, blockseed)
+	local gennotify = core.get_mapgen_object("gennotify")
 	local poslist = {}
 
 	for _, pos in ipairs(gennotify["decoration#"..firefly_low] or {}) do
@@ -253,7 +253,7 @@ minetest.register_on_generated(function(minp, maxp, blockseed)
 	if #poslist ~= 0 then
 		for i = 1, #poslist do
 			local pos = poslist[i]
-			minetest.get_node_timer(pos):start(1)
+			core.get_node_timer(pos):start(1)
 		end
 	end
 end)

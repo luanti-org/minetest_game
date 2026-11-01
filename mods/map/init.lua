@@ -6,14 +6,14 @@ map = {}
 
 
 -- Load support for MT game translation.
-local S = minetest.get_translator("map")
+local S = core.get_translator("map")
 
 
 -- Update HUD flags
 -- Global to allow overriding
 
 function map.update_hud_flags(player)
-	local creative_enabled = minetest.is_creative_enabled(player:get_player_name())
+	local creative_enabled = core.is_creative_enabled(player:get_player_name())
 
 	local minimap_enabled = creative_enabled or
 		player:get_inventory():contains_item("main", "map:mapping_kit")
@@ -28,7 +28,7 @@ end
 
 -- Set HUD flags 'on joinplayer'
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	map.update_hud_flags(player)
 end)
 
@@ -36,18 +36,18 @@ end)
 -- Cyclic update of HUD flags
 
 local function cyclic_update()
-	for _, player in ipairs(minetest.get_connected_players()) do
+	for _, player in ipairs(core.get_connected_players()) do
 		map.update_hud_flags(player)
 	end
-	minetest.after(5.3, cyclic_update)
+	core.after(5.3, cyclic_update)
 end
 
-minetest.after(5.3, cyclic_update)
+core.after(5.3, cyclic_update)
 
 
 -- Mapping kit item
 
-minetest.register_craftitem("map:mapping_kit", {
+core.register_craftitem("map:mapping_kit", {
 	description = S("Mapping Kit") .. "\n" .. S("Use with 'Minimap' key"),
 	inventory_image = "map_mapping_kit.png",
 	stack_max = 1,
@@ -61,7 +61,7 @@ minetest.register_craftitem("map:mapping_kit", {
 
 -- Crafting
 
-minetest.register_craft({
+core.register_craft({
 	output = "map:mapping_kit",
 	recipe = {
 		{"default:glass", "default:paper", "group:stick"},
@@ -73,7 +73,7 @@ minetest.register_craft({
 
 -- Fuel
 
-minetest.register_craft({
+core.register_craft({
 	type = "fuel",
 	recipe = "map:mapping_kit",
 	burntime = 5,

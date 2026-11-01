@@ -3,7 +3,7 @@
 -- support for MT game translation.
 local S = farming.get_translator
 
-minetest.override_item("default:dirt", {
+core.override_item("default:dirt", {
 	soil = {
 		base = "default:dirt",
 		dry = "farming:soil",
@@ -11,7 +11,7 @@ minetest.override_item("default:dirt", {
 	}
 })
 
-minetest.override_item("default:dirt_with_grass", {
+core.override_item("default:dirt_with_grass", {
 	soil = {
 		base = "default:dirt_with_grass",
 		dry = "farming:soil",
@@ -19,7 +19,7 @@ minetest.override_item("default:dirt_with_grass", {
 	}
 })
 
-minetest.override_item("default:dirt_with_dry_grass", {
+core.override_item("default:dirt_with_dry_grass", {
 	soil = {
 		base = "default:dirt_with_dry_grass",
 		dry = "farming:soil",
@@ -27,7 +27,7 @@ minetest.override_item("default:dirt_with_dry_grass", {
 	}
 })
 
-minetest.override_item("default:dirt_with_rainforest_litter", {
+core.override_item("default:dirt_with_rainforest_litter", {
 	soil = {
 		base = "default:dirt_with_rainforest_litter",
 		dry = "farming:soil",
@@ -35,7 +35,7 @@ minetest.override_item("default:dirt_with_rainforest_litter", {
 	}
 })
 
-minetest.override_item("default:dirt_with_coniferous_litter", {
+core.override_item("default:dirt_with_coniferous_litter", {
 	soil = {
 		base = "default:dirt_with_coniferous_litter",
 		dry = "farming:soil",
@@ -43,7 +43,7 @@ minetest.override_item("default:dirt_with_coniferous_litter", {
 	}
 })
 
-minetest.override_item("default:dry_dirt", {
+core.override_item("default:dry_dirt", {
 	soil = {
 		base = "default:dry_dirt",
 		dry = "farming:dry_soil",
@@ -51,7 +51,7 @@ minetest.override_item("default:dry_dirt", {
 	}
 })
 
-minetest.override_item("default:dry_dirt_with_dry_grass", {
+core.override_item("default:dry_dirt_with_dry_grass", {
 	soil = {
 		base = "default:dry_dirt_with_dry_grass",
 		dry = "farming:dry_soil",
@@ -59,7 +59,7 @@ minetest.override_item("default:dry_dirt_with_dry_grass", {
 	}
 })
 
-minetest.register_node("farming:soil", {
+core.register_node("farming:soil", {
 	description = S("Soil"),
 	tiles = {"default_dirt.png^farming_soil.png", "default_dirt.png"},
 	drop = "default:dirt",
@@ -72,7 +72,7 @@ minetest.register_node("farming:soil", {
 	}
 })
 
-minetest.register_node("farming:soil_wet", {
+core.register_node("farming:soil_wet", {
 	description = S("Wet Soil"),
 	tiles = {"default_dirt.png^farming_soil_wet.png", "default_dirt.png^farming_soil_wet_side.png"},
 	drop = "default:dirt",
@@ -85,7 +85,7 @@ minetest.register_node("farming:soil_wet", {
 	}
 })
 
-minetest.register_node("farming:dry_soil", {
+core.register_node("farming:dry_soil", {
 	description = S("Savanna Soil"),
 	tiles = {"default_dry_dirt.png^farming_soil.png", "default_dry_dirt.png"},
 	drop = "default:dry_dirt",
@@ -98,7 +98,7 @@ minetest.register_node("farming:dry_soil", {
 	}
 })
 
-minetest.register_node("farming:dry_soil_wet", {
+core.register_node("farming:dry_soil_wet", {
 	description = S("Wet Savanna Soil"),
 	tiles = {"default_dry_dirt.png^farming_soil_wet.png", "default_dry_dirt.png^farming_soil_wet_side.png"},
 	drop = "default:dry_dirt",
@@ -111,7 +111,7 @@ minetest.register_node("farming:dry_soil_wet", {
 	}
 })
 
-minetest.override_item("default:desert_sand", {
+core.override_item("default:desert_sand", {
 	groups = {crumbly=3, falling_node=1, sand=1, soil = 1},
 	soil = {
 		base = "default:desert_sand",
@@ -119,7 +119,7 @@ minetest.override_item("default:desert_sand", {
 		wet = "farming:desert_sand_soil_wet"
 	}
 })
-minetest.register_node("farming:desert_sand_soil", {
+core.register_node("farming:desert_sand_soil", {
 	description = S("Desert Sand Soil"),
 	drop = "default:desert_sand",
 	tiles = {"farming_desert_sand_soil.png", "default_desert_sand.png"},
@@ -132,7 +132,7 @@ minetest.register_node("farming:desert_sand_soil", {
 	}
 })
 
-minetest.register_node("farming:desert_sand_soil_wet", {
+core.register_node("farming:desert_sand_soil_wet", {
 	description = S("Wet Desert Sand Soil"),
 	drop = "default:desert_sand",
 	tiles = {"farming_desert_sand_soil_wet.png", "farming_desert_sand_soil_wet_side.png"},
@@ -145,7 +145,7 @@ minetest.register_node("farming:desert_sand_soil_wet", {
 	}
 })
 
-minetest.register_node("farming:straw", {
+core.register_node("farming:straw", {
 	description = S("Straw"),
 	tiles = {"farming_straw.png"},
 	is_ground_content = false,
@@ -154,7 +154,7 @@ minetest.register_node("farming:straw", {
 })
 
 -- Registered before the stairs so the stairs get fuel recipes.
-minetest.register_craft({
+core.register_craft({
 	type = "fuel",
 	recipe = "farming:straw",
 	burntime = 3,
@@ -176,13 +176,13 @@ do
 		sounds, true)
 end
 
-minetest.register_abm({
+core.register_abm({
 	label = "Farming soil",
 	nodenames = {"group:field"},
 	interval = 15,
 	chance = 4,
 	action = function(pos, node)
-		local n_def = minetest.registered_nodes[node.name] or nil
+		local n_def = core.registered_nodes[node.name] or nil
 		local wet = n_def.soil.wet or nil
 		local base = n_def.soil.base or nil
 		local dry = n_def.soil.dry or nil
@@ -191,38 +191,38 @@ minetest.register_abm({
 		end
 
 		pos.y = pos.y + 1
-		local nn = minetest.get_node_or_nil(pos)
+		local nn = core.get_node_or_nil(pos)
 		if not nn or not nn.name then
 			return
 		end
-		local nn_def = minetest.registered_nodes[nn.name] or nil
+		local nn_def = core.registered_nodes[nn.name] or nil
 		pos.y = pos.y - 1
 
-		if nn_def and nn_def.walkable and minetest.get_item_group(nn.name, "plant") == 0 then
-			minetest.set_node(pos, {name = base})
+		if nn_def and nn_def.walkable and core.get_item_group(nn.name, "plant") == 0 then
+			core.set_node(pos, {name = base})
 			return
 		end
 		-- check if there is water nearby
-		local wet_lvl = minetest.get_item_group(node.name, "wet")
-		if minetest.find_node_near(pos, 3, {"group:water"}) then
+		local wet_lvl = core.get_item_group(node.name, "wet")
+		if core.find_node_near(pos, 3, {"group:water"}) then
 			-- if it is dry soil and not base node, turn it into wet soil
 			if wet_lvl == 0 then
-				minetest.set_node(pos, {name = wet})
+				core.set_node(pos, {name = wet})
 			end
 		else
 			-- only turn back if there are no unloaded blocks (and therefore
 			-- possible water sources) nearby
-			if not minetest.find_node_near(pos, 3, {"ignore"}) then
+			if not core.find_node_near(pos, 3, {"ignore"}) then
 				-- turn it back into base if it is already dry
 				if wet_lvl == 0 then
 					-- only turn it back if there is no plant/seed on top of it
-					if minetest.get_item_group(nn.name, "plant") == 0 and minetest.get_item_group(nn.name, "seed") == 0 then
-						minetest.set_node(pos, {name = base})
+					if core.get_item_group(nn.name, "plant") == 0 and core.get_item_group(nn.name, "seed") == 0 then
+						core.set_node(pos, {name = base})
 					end
 
 				-- if its wet turn it back into dry soil
 				elseif wet_lvl == 1 then
-					minetest.set_node(pos, {name = dry})
+					core.set_node(pos, {name = dry})
 				end
 			end
 		end
@@ -233,7 +233,7 @@ minetest.register_abm({
 -- Make default:grass_* occasionally drop wheat seed
 
 for i = 1, 5 do
-	minetest.override_item("default:grass_"..i, {drop = {
+	core.override_item("default:grass_"..i, {drop = {
 		max_items = 1,
 		items = {
 			{items = {"farming:seed_wheat"}, rarity = 5},
@@ -250,7 +250,7 @@ end
 -- This source is kept for now to avoid disruption but should probably be
 -- removed in future as players get used to the new source.
 
-minetest.override_item("default:junglegrass", {drop = {
+core.override_item("default:junglegrass", {drop = {
 	max_items = 1,
 	items = {
 		{items = {"farming:seed_cotton"}, rarity = 8},
@@ -261,7 +261,7 @@ minetest.override_item("default:junglegrass", {drop = {
 
 -- Wild cotton as a source of cotton seed
 
-minetest.register_node("farming:cotton_wild", {
+core.register_node("farming:cotton_wild", {
 	description = S("Wild Cotton"),
 	drawtype = "plantlike",
 	waving = 1,

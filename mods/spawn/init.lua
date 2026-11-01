@@ -1,11 +1,11 @@
 -- Always load the API
 ----------------------
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/api.lua")
+dofile(core.get_modpath(core.get_current_modname()) .. "/api.lua")
 
 -- Disable biome-search implementation on unsuitable mapgens
 ------------------------------------------------------------
 
-local mg_name = minetest.get_mapgen_setting("mg_name")
+local mg_name = core.get_mapgen_setting("mg_name")
 if mg_name == "v6" or mg_name == "singlenode" then
 	return
 end
@@ -28,7 +28,7 @@ local pos = {x = 0, y = 8, z = 0}
 local biome_ids = {}
 
 function spawn.add_suitable_biome(biome)
-	local id = minetest.get_biome_id(biome)
+	local id = core.get_biome_id(biome)
 	assert(id ~= nil)
 	biome_ids[id] = true
 end
@@ -36,7 +36,7 @@ end
 for _, name in ipairs({
 	"taiga", "coniferous_forest", "deciduous_forest", "grassland", "savanna"
 }) do
-	local id = minetest.get_biome_id(name)
+	local id = core.get_biome_id(name)
 	if id then
 		biome_ids[id] = true
 	end
@@ -96,10 +96,10 @@ end
 local function search()
 	local edge1, edge2 = core.get_mapgen_edges()
 	for iter = 1, checks do
-		local biome_data = minetest.get_biome_data(pos)
+		local biome_data = core.get_biome_data(pos)
 		-- Sometimes biome_data is nil
 		if biome_data and biome_ids[biome_data.biome] then
-			local spawn_y = minetest.get_spawn_level(pos.x, pos.z)
+			local spawn_y = core.get_spawn_level(pos.x, pos.z)
 			if spawn_y then
 				spawn_pos = vector.new(pos.x, spawn_y, pos.z)
 				return true

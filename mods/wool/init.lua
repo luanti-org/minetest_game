@@ -1,7 +1,7 @@
 -- wool/init.lua
 
 -- Load support for MT game translation.
-local S = minetest.get_translator("wool")
+local S = core.get_translator("wool")
 
 local dyes = dye.dyes
 
@@ -10,7 +10,7 @@ for i = 1, #dyes do
 
 	local color_group = "color_" .. name
 
-	minetest.register_node("wool:" .. name, {
+	core.register_node("wool:" .. name, {
 		description = S(desc .. " Wool"),
 		tiles = {"wool_" .. name .. ".png"},
 		is_ground_content = false,
@@ -19,7 +19,7 @@ for i = 1, #dyes do
 		sounds = default.node_sound_defaults(),
 	})
 
-	minetest.register_craft{
+	core.register_craft{
 		type = "shapeless",
 		output = "wool:" .. name,
 		recipe = {"group:dye," .. color_group, "group:wool"},
@@ -28,8 +28,8 @@ end
 
 -- Legacy
 -- Backwards compatibility with jordach's 16-color wool mod
-minetest.register_alias("wool:dark_blue", "wool:blue")
-minetest.register_alias("wool:gold", "wool:yellow")
+core.register_alias("wool:dark_blue", "wool:blue")
+core.register_alias("wool:gold", "wool:yellow")
 
 -- Dummy calls to S() to allow translation scripts to detect the strings.
 -- To update this run:

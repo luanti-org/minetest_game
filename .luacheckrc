@@ -26,10 +26,10 @@ read_globals = {
 }
 
 -- Overwrites minetest.handle_node_drops
-files["mods/creative/init.lua"].globals = { "minetest" }
+files["mods/creative/init.lua"].globals = { "minetest", "core" }
 
 -- Overwrites minetest.calculate_knockback
-files["mods/player_api/api.lua"].globals = { "minetest" }
+files["mods/player_api/api.lua"].globals = { "minetest", "core" }
 
 -- Don't report on legacy definitions of globals.
 files["mods/default/legacy.lua"].global = false

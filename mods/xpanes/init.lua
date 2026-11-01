@@ -1,24 +1,24 @@
 -- xpanes/init.lua
 
 -- Load support for MT game translation.
-local S = minetest.get_translator("xpanes")
+local S = core.get_translator("xpanes")
 
 
 local function is_pane(pos)
-	return minetest.get_item_group(minetest.get_node(pos).name, "pane") > 0
+	return core.get_item_group(core.get_node(pos).name, "pane") > 0
 end
 
 local function connects_dir(pos, name, dir)
-	local aside = vector.add(pos, minetest.facedir_to_dir(dir))
+	local aside = vector.add(pos, core.facedir_to_dir(dir))
 	if is_pane(aside) then
 		return true
 	end
 
-	local connects_to = minetest.registered_nodes[name].connects_to
+	local connects_to = core.registered_nodes[name].connects_to
 	if not connects_to then
 		return false
 	end
-	local list = minetest.find_nodes_in_area(aside, aside, connects_to)
+	local list = core.find_nodes_in_area(aside, aside, connects_to)
 
 	if #list > 0 then
 		return true
@@ -32,14 +32,14 @@ local function swap(pos, node, name, param2)
 		return
 	end
 
-	minetest.swap_node(pos, {name = name, param2 = param2})
+	core.swap_node(pos, {name = name, param2 = param2})
 end
 
 local function update_pane(pos)
 	if not is_pane(pos) then
 		return
 	end
-	local node = minetest.get_node(pos)
+	local node = core.get_node(pos)
 	local name = node.name
 	if name:sub(-5) == "_flat" then
 		name = name:sub(1, -6)
@@ -71,19 +71,19 @@ local function update_pane(pos)
 	end
 end
 
-minetest.register_on_placenode(function(pos, node)
-	if minetest.get_item_group(node, "pane") then
+core.register_on_placenode(function(pos, node)
+	if core.get_item_group(node, "pane") then
 		update_pane(pos)
 	end
 	for i = 0, 3 do
-		local dir = minetest.facedir_to_dir(i)
+		local dir = core.facedir_to_dir(i)
 		update_pane(vector.add(pos, dir))
 	end
 end)
 
-minetest.register_on_dignode(function(pos)
+core.register_on_dignode(function(pos)
 	for i = 0, 3 do
-		local dir = minetest.facedir_to_dir(i)
+		local dir = core.facedir_to_dir(i)
 		update_pane(vector.add(pos, dir))
 	end
 end)
@@ -91,12 +91,12 @@ end)
 xpanes = {}
 function xpanes.register_pane(name, def)
 	for i = 1, 15 do
-		minetest.register_alias("xpanes:" .. name .. "_" .. i, "xpanes:" .. name .. "_flat")
+		core.register_alias("xpanes:" .. name .. "_" .. i, "xpanes:" .. name .. "_flat")
 	end
 
 	local flatgroups = table.copy(def.groups)
 	flatgroups.pane = 1
-	minetest.register_node(":xpanes:" .. name .. "_flat", {
+	core.register_node(":xpanes:" .. name .. "_flat", {
 		description = def.description,
 		drawtype = "nodebox",
 		paramtype = "light",
@@ -131,7 +131,7 @@ function xpanes.register_pane(name, def)
 	local groups = table.copy(def.groups)
 	groups.pane = 1
 	groups.not_in_creative_inventory = 1
-	minetest.register_node(":xpanes:" .. name, {
+	core.register_node(":xpanes:" .. name, {
 		drawtype = "nodebox",
 		paramtype = "light",
 		is_ground_content = false,
@@ -157,7 +157,7 @@ function xpanes.register_pane(name, def)
 		connects_to = {"group:pane", "group:stone", "group:glass", "group:wood", "group:tree"},
 	})
 
-	minetest.register_craft({
+	core.register_craft({
 		output = "xpanes:" .. name .. "_flat 16",
 		recipe = def.recipe
 	})
@@ -202,13 +202,13 @@ xpanes.register_pane("bar", {
 	}
 })
 
-minetest.register_lbm({
+core.register_lbm({
 	name = "xpanes:gen2",
 	nodenames = {"group:pane"},
 	action = function(pos, node)
 		update_pane(pos)
 		for i = 0, 3 do
-			local dir = minetest.facedir_to_dir(i)
+			local dir = core.facedir_to_dir(i)
 			update_pane(vector.add(pos, dir))
 		end
 	end
@@ -216,7 +216,7 @@ minetest.register_lbm({
 
 -- Register steel bar doors and trapdoors
 
-if minetest.get_modpath("doors") then
+if core.get_modpath("doors") then
 
 	doors.register("xpanes:door_steel_bar", {
 		tiles = {{name = "xpanes_door_steel_bar.png", backface_culling = true}},
@@ -251,7 +251,7 @@ if minetest.get_modpath("doors") then
 		gain_close = 0.13,
 	})
 
-	minetest.register_craft({
+	core.register_craft({
 		output = "xpanes:trapdoor_steel_bar",
 		recipe = {
 			{"xpanes:bar_flat", "xpanes:bar_flat"},

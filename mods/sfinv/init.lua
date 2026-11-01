@@ -1,9 +1,9 @@
 -- sfinv/init.lua
 
-dofile(minetest.get_modpath("sfinv") .. "/api.lua")
+dofile(core.get_modpath("sfinv") .. "/api.lua")
 
 -- Load support for MT game translation.
-local S = minetest.get_translator("sfinv")
+local S = core.get_translator("sfinv")
 
 sfinv.register_page("sfinv:crafting", {
 	title = S("Crafting"),
