@@ -123,6 +123,70 @@ local function add_item_or_drop(inv, pos, item)
 	end
 end
 
+local function parse_can_cook(v)
+	if v == true then
+		return 1
+	elseif v == false then
+		return 0
+	elseif v == nil then
+		return 1
+	else
+		return v
+	end
+end
+
+local function create_callback()
+	local registered = {count = 0}
+	local register = function(f)
+		local new_count = registered.count + 1
+		registered.count = new_count
+		registered[new_count] = f
+	end
+	return register, registered
+end
+
+local register_can_cook, registered_can_cook = create_callback()
+
+default.register_can_cook, default.registered_can_cook = register_can_cook, registered_can_cook
+
+local function can_cook(...)
+	local mul = 1
+	for _, f in ipairs(registered_can_cook) do
+		local r = parse_can_cook(f(...))
+		if r == 0 then return 0 end
+		mul = mul * r
+	end
+	return mul
+end
+
+local register_on_cook, registered_on_cook = create_callback()
+
+default.register_on_cook, default.registered_on_cook = register_on_cook, registered_on_cook
+
+local function on_cook(...)
+	local fail = false
+	for _, f in ipairs(registered_on_cook) do
+		local r = f(...)
+		if r then fail = true end
+	end
+	return fail
+end
+
+local register_on_fuel, registered_on_fuel = create_callback()
+
+default.register_on_fuel, default.registered_on_fuel = register_on_fuel, registered_on_fuel
+
+local function on_fuel(...)
+	local keep_fuel = false
+	local burn_time = nil
+	for _, f in ipairs(registered_on_cook) do
+		local prop_time, prop_keep_fuel = f(...)
+		burn_time = burn_time or prop_time
+		if prop_keep_fuel then keep_fuel = true end
+	end
+	return burn_time, keep_fuel
+end
+
 local function furnace_node_timer(pos, elapsed)
 	--
 	-- Initialize metadata
@@ -141,6 +205,7 @@ local function furnace_node_timer(pos, elapsed)
 
 	local cookable, cooked
 	local fuel
+	local burn_time
 	local update = true
 	local items_smelt = 0
 	while elapsed > 0 and update do
@@ -156,7 +221,9 @@ local function furnace_node_timer(pos, elapsed)
 		-- Check if we have cookable content
 		local aftercooked
 		cooked, aftercooked = core.get_craft_result({method = "cooking", width = 1, items = srclist})
-		cookable = cooked.time ~= 0
+
+		local mult = can_cook(pos, inv, srclist)
+		cookable = (cooked.time ~= 0) and (mult > 0)
 
 		local el = math.min(elapsed, fuel_totaltime - fuel_time)
 		if cookable then -- fuel lasts long enough, adjust el to cooking duration
@@ -169,37 +236,44 @@ local function furnace_node_timer(pos, elapsed)
 			fuel_time = fuel_time + el
 			-- If there is a cookable item then check if it is ready yet
 			if cookable then
-				src_time = src_time + el
+				src_time = src_time + el * mult
 				if src_time >= cooked.time then
 					-- Place result in dst list if possible
-					if inv:room_for_item("dst", cooked.item) then
-						inv:add_item("dst", cooked.item)
+					local process = not on_cook(pos, inv, srclist)
+					if process then
+						if inv:room_for_item("dst", cooked.item) then
+							inv:add_item("dst", cooked.item)
 
-						-- stop any final replacement from clogging "src"
-						local can_cook = core.get_craft_result({
+							-- stop any final replacement from clogging "src"
+							local can_cook = core.get_craft_result({
 								method = "cooking", width = 1,
 								items = {aftercooked.items[1]:to_string()}})
-						can_cook = can_cook.time ~= 0 or not can_cook.item:is_empty()
+							can_cook = can_cook.time ~= 0 or not can_cook.item:is_empty()
 
-						if aftercooked.items[1]:is_empty() or can_cook then
-							-- cook the final "src" item in the next cycle
-							inv:set_stack("src", 1, aftercooked.items[1])
+							if aftercooked.items[1]:is_empty() or can_cook then
+								-- cook the final "src" item in the next cycle
+								inv:set_stack("src", 1, aftercooked.items[1])
+							else
+								-- the final "src" item was replaced and is not cookable
+								inv:set_stack("src", 1, "")
+								add_item_or_drop(inv, pos, aftercooked.items[1])
+							end
+
+							src_time = src_time - cooked.time
+							items_smelt = items_smelt + 1
+							update = true
+							-- add replacement item to dst so they arent lost
+							if cooked.replacements[1] then
+								add_item_or_drop(inv, pos, cooked.replacements[1])
+							end
 						else
-							-- the final "src" item was replaced and is not cookable
-							inv:set_stack("src", 1, "")
-							add_item_or_drop(inv, pos, aftercooked.items[1])
-						end
-
-						src_time = src_time - cooked.time
-						update = true
-						-- add replacement item to dst so they arent lost
-						if cooked.replacements[1] then
-							add_item_or_drop(inv, pos, cooked.replacements[1])
+							dst_full = true
 						end
 					else
-						dst_full = true
+						src_time = src_time - cooked.time
+						items_smelt = items_smelt + 1
+						update = true
 					end
-					items_smelt = items_smelt + 1
 				else
 					-- Item could not be cooked: probably missing fuel
 					update = true
@@ -212,27 +286,32 @@ local function furnace_node_timer(pos, elapsed)
 				local afterfuel
 				fuel, afterfuel = core.get_craft_result({method = "fuel", width = 1, items = fuellist})
 
-				if fuel.time == 0 then
+				local on_fuel_time, keep_item = on_fuel(pos, inv, fuellist)
+				burn_time = on_fuel_time or fuel.time
+
+				if burn_time == 0 then
 					-- No valid fuel in fuel list
 					fuel_totaltime = 0
 					src_time = 0
 				else
-					-- prevent blocking of fuel inventory (for automatization mods)
-					local is_fuel = core.get_craft_result({method = "fuel", width = 1, items = {afterfuel.items[1]:to_string()}})
-					if is_fuel.time == 0 then
-						table.insert(fuel.replacements, afterfuel.items[1])
-						inv:set_stack("fuel", 1, "")
-					else
-						-- Take fuel from fuel list
-						inv:set_stack("fuel", 1, afterfuel.items[1])
-					end
-					-- Put replacements in dst list or drop them on the furnace.
-					local replacements = fuel.replacements
-					if replacements[1] then
-						add_item_or_drop(inv, pos, replacements[1])
+					if not keep_item then
+						-- prevent blocking of fuel inventory (for automatization mods)
+						local is_fuel = core.get_craft_result({method = "fuel", width = 1, items = {afterfuel.items[1]:to_string()}})
+						if is_fuel.time == 0 then
+							table.insert(fuel.replacements, afterfuel.items[1])
+							inv:set_stack("fuel", 1, "")
+						else
+							-- Take fuel from fuel list
+							inv:set_stack("fuel", 1, afterfuel.items[1])
+						end
+						-- Put replacements in dst list or drop them on the furnace.
+						local replacements = fuel.replacements
+						if replacements[1] then
+							add_item_or_drop(inv, pos, replacements[1])
+						end
 					end
 					update = true
-					fuel_totaltime = fuel.time + (fuel_totaltime - fuel_time)
+					fuel_totaltime = burn_time + (fuel_totaltime - fuel_time)
 				end
 			else
 				-- We don't need to get new fuel since there is no cookable item
@@ -250,8 +329,8 @@ local function furnace_node_timer(pos, elapsed)
 		core.sound_play("default_cool_lava",
 			{ pos = pos, max_hear_distance = 16, gain = 0.07 * math.min(items_smelt, 7) }, true)
 	end
-	if fuel and fuel_totaltime > fuel.time then
-		fuel_totaltime = fuel.time
+	if fuel and fuel_totaltime > burn_time then
+		fuel_totaltime = burn_time
 	end
 	if srclist and srclist[1]:is_empty() then
 		src_time = 0
