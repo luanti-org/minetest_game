@@ -149,7 +149,7 @@ local register_can_cook, registered_can_cook = create_callback()
 
 default.register_can_cook, default.registered_can_cook = register_can_cook, registered_can_cook
 
-local function can_cook(...)
+local function can_cook_callbacks(...)
 	local mul = 1
 	for _, f in ipairs(registered_can_cook) do
 		local r = parse_can_cook(f(...))
@@ -163,22 +163,22 @@ local register_on_cook, registered_on_cook = create_callback()
 
 default.register_on_cook, default.registered_on_cook = register_on_cook, registered_on_cook
 
-local function on_cook(...)
-	local fail = false
+local function on_cook_callbacks(...)
+	local no_take = false
 	for _, f in ipairs(registered_on_cook) do
 		local r = f(...)
-		if r then fail = true end
+		if r then no_take = true end
 	end
-	return fail
+	return no_take
 end
 
 local register_on_fuel, registered_on_fuel = create_callback()
 
 default.register_on_fuel, default.registered_on_fuel = register_on_fuel, registered_on_fuel
 
-local function on_fuel(...)
+local function on_fuel_callbacks(...)
 	local keep_fuel = false
-	local burn_time = nil
+	local burn_time
 	for _, f in ipairs(registered_on_fuel) do
 		local proposed_time, proposed_keep_fuel = f(...)
 		burn_time = burn_time or proposed_time
@@ -222,7 +222,7 @@ local function furnace_node_timer(pos, elapsed)
 		local aftercooked
 		cooked, aftercooked = core.get_craft_result({method = "cooking", width = 1, items = srclist})
 
-		local mult = can_cook(pos, inv, srclist)
+		local mult = can_cook_callbacks(pos, inv, srclist)
 		cookable = (cooked.time ~= 0) and (mult > 0)
 
 		local el = math.min(elapsed, fuel_totaltime - fuel_time)
@@ -239,7 +239,7 @@ local function furnace_node_timer(pos, elapsed)
 				src_time = src_time + el * mult
 				if src_time >= cooked.time then
 					-- Place result in dst list if possible
-					local process = not on_cook(pos, inv, srclist)
+					local process = not on_cook_callbacks(pos, inv, srclist)
 					if process then
 						if inv:room_for_item("dst", cooked.item) then
 							inv:add_item("dst", cooked.item)
@@ -286,7 +286,7 @@ local function furnace_node_timer(pos, elapsed)
 				local afterfuel
 				fuel, afterfuel = core.get_craft_result({method = "fuel", width = 1, items = fuellist})
 
-				local on_fuel_time, keep_item = on_fuel(pos, inv, fuellist)
+				local on_fuel_time, keep_item = on_fuel_callbacks(pos, inv, fuellist)
 				burn_time = on_fuel_time or fuel.time
 
 				if burn_time == 0 then

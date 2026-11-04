@@ -164,6 +164,58 @@ The chests API allows the creation of chests, which have their own inventories f
 	protected = false, -- If true, only placer can modify chest.
 
 
+Furnace API
+----------
+
+The furnace API allows registering and obtaining callbacks related to furnace behavior.
+
+`default.register_can_cook(func)`
+
+* Registers a callback to be called before an item is cooked. This can be used
+  to prevent cooking or change its rate.
+* `func`: `function(pos, inv, src_list)` with arguments
+  - `pos`: Position of the furnace.
+  - `inv`: InvRef
+  - `src_list`: Source inventory list table.
+  - return value: cook speed multiplier, 0 to prevent cooking entirely.
+     `nil` and ``true` mean 1, `false` means 0.
+
+`default.registered_can_cook`
+
+* Table containing functions registered by the `default.register_can_cook`.
+* Contains `count` member, representing the number of such functions.
+
+`default.register_on_cook(func)`
+
+* Registers a callback to be called while an item is cooked. This can be used
+  to cause a recipe to fail, not taking input nor producing output.
+* `func`: `function(pos, inv, src_list)` with arguments
+  - `pos`: Position of the furnace.
+  - `inv`: InvRef
+  - `src_list`: Source inventory list table.
+  - return value: whether the recipe fails.
+
+`default.registered_on_cook`
+
+* Table containing functions registered by the `default.register_on_cook`.
+* Contains `count` member, representing the number of such functions.
+
+`default.register_on_fuel(func)`
+
+* Registers a callback to be called before fuel is taken. This can be used
+  to multiply a fuel item's efficacy, or to prevent its consumption.
+* `func`: `function(pos, inv, src_list)` with arguments
+  - `pos`: Position of the furnace.
+  - `inv`: InvRef
+  - `src_list`: Source inventory list table.
+  - return values: fuel value multiplier, whether to consume a fuel item.
+
+`default.registered_on_fuel`
+
+* Table containing functions registered by the `default.register_on_fuel`.
+* Contains `count` member, representing the number of such functions.
+
+
 Doors API
 ---------
 
