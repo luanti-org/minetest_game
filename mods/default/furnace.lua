@@ -179,10 +179,10 @@ default.register_on_fuel, default.registered_on_fuel = register_on_fuel, registe
 local function on_fuel(...)
 	local keep_fuel = false
 	local burn_time = nil
-	for _, f in ipairs(registered_on_cook) do
-		local prop_time, prop_keep_fuel = f(...)
-		burn_time = burn_time or prop_time
-		if prop_keep_fuel then keep_fuel = true end
+	for _, f in ipairs(registered_on_fuel) do
+		local proposed_time, proposed_keep_fuel = f(...)
+		burn_time = burn_time or proposed_time
+		if proposed_keep_fuel then keep_fuel = true end
 	end
 	return burn_time, keep_fuel
 end
