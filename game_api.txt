@@ -553,15 +553,17 @@ TNT API
   * `side`  Side tiles. By default the name of the tnt with a suffix of `_side.png`.
   * `top`  Top tile. By default the name of the tnt with a suffix of `_top.png`.
   * `bottom` Bottom tile. By default the name of the tnt with a suffix of `_bottom.png`.
-  * `burning` Top tile when lit. By default the name of the tnt with a suffix of `_top_burning_animated.png".
+  * `burning` Top tile when lit. By default the name of the tnt with a suffix of `_top_burning_animated.png`.
 
-`tnt.boom(position[, definition])`
+`tnt.boom(position[, definition, igniter])`
 
 ^ Create an explosion.
 
 * `position` The center of explosion.
 * `definition` The TNT definion as passed to `tnt.register` with the following addition:
  * `explode_center` false by default which removes TNT node on blast, when true will explode center node.
+   Effect only applies if `ignore_on_blast` is set to false.
+* `igniter` Name of player causing explosion (optional, used for protection checks).
 
 `tnt.burn(position, [nodename])`
 
