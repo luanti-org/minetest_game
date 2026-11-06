@@ -159,10 +159,18 @@ do
 		"listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]",
 		("list[detached:trash;main;%.2f,%.2f;1,1;]"):format(_trash_x, items_y_span),
 		"listring[]",
-		("image_button[%.2f,%.2f;1,1;creative_prev_icon.png;creative_prev;]"):format(_trash_x + button_width + spacing, items_y_span),
-		("image_button[%.2f,%.2f;1,1;creative_next_icon.png;creative_next;]"):format(_trash_x + (button_width + spacing) * 3, items_y_span),
-		("image_button[%.2f,%.2f;1,1;creative_search_icon.png;creative_search;]"):format(filter_width + spacing, items_y_span),
-		("image_button[%.2f,%.2f;1,1;creative_clear_icon.png;creative_clear;]"):format(filter_width + spacing + button_width + spacing, items_y_span),
+		("image_button[%.2f,%.2f;1,1;creative_prev_icon.png;creative_prev;]"):format(
+			_trash_x + button_width + spacing, items_y_span
+		),
+		("image_button[%.2f,%.2f;1,1;creative_next_icon.png;creative_next;]"):format(
+			_trash_x + (button_width + spacing) * 3, items_y_span
+		),
+		("image_button[%.2f,%.2f;1,1;creative_search_icon.png;creative_search;]"):format(
+			filter_width + spacing, items_y_span
+		),
+		("image_button[%.2f,%.2f;1,1;creative_clear_icon.png;creative_clear;]"):format(
+			filter_width + spacing + button_width + spacing, items_y_span
+		),
 		("tooltip[creative_search;%s]"):format(esc(S("Search"))),
 		("tooltip[creative_clear;%s]"):format(esc(S("Reset"))),
 		("tooltip[creative_prev;%s]"):format(esc(S("Previous page"))),
@@ -193,7 +201,11 @@ function creative.register_tab(name, title, items)
 					filter_width + (spacing + button_width) * 4 + spacing + 0.2, items_y_span + 0.5,
 					core.colorize("#FFFF00", tostring(pagenum)), pagemax
 				),
-				("field[%.2f,%.2f;%.2f,%.2f;creative_filter;;%s]"):format(0, items_y_span, filter_width, lower_bar_height, esc(inv.filter)),
+				("field[%.2f,%.2f;%.2f,%.2f;creative_filter;;%s]"):format(
+					0, items_y_span,
+					filter_width, lower_bar_height,
+					esc(inv.filter)
+				),
 				("listring[detached:creative_%s;main]"):format(player_name),
 				("list[detached:creative_%s;main;0,0;8,4;%d]"):format(player_name, inv.start_i),
 				creative.formspec_add

@@ -25,7 +25,10 @@ local _inv_height = 4 * _slot_interval -- player inventory height
 
 local formspec_base = table.concat({
 	"formspec_version[4]",
-	("size[%.2f,%.2f]"):format(margin + _form_body_width + margin, margin + furnace_body_height + gap + _inv_height + margin),
+	("size[%.2f,%.2f]"):format(
+		margin + _form_body_width + margin,
+		margin + furnace_body_height + gap + _inv_height + margin
+	),
 	("list[context;src;%.2f,%.2f;1,1;]"):format(_furnace_body_x, margin),
 	("list[context;fuel;%.2f,%.2f;1,1;]"):format(_furnace_body_x, margin + _slot_interval * 2),
 	("list[context;dst;%.2f,%.2f;2,2;]"):format(_furnace_body_x + _slot_interval * 2, margin + _slot_interval* 0.5),
@@ -42,15 +45,26 @@ function default.get_furnace_inactive_formspec()
 	return table.concat({
 		formspec_base,
 		("image[%.2f,%.2f;1,1;default_furnace_fire_bg.png]"):format(_furnace_body_x, margin + _slot_interval),
-		("image[%.2f,%.2f;1,1;gui_furnace_arrow_bg.png^[transformR270]"):format(_furnace_body_x + _slot_interval, margin + _slot_interval)
+		("image[%.2f,%.2f;1,1;gui_furnace_arrow_bg.png^[transformR270]"):format(
+			_furnace_body_x + _slot_interval,
+			margin + _slot_interval
+		)
 	})
 end
 
 function default.get_furnace_active_formspec(fuel_percent, item_percent)
 	return table.concat({
 		formspec_base,
-		("image[%.2f,%.2f;1,1;default_furnace_fire_bg.png^[lowpart:%d:default_furnace_fire_fg.png]"):format(_furnace_body_x, margin + _slot_interval, fuel_percent),
-		("image[%.2f,%.2f;1,1;gui_furnace_arrow_bg.png^[lowpart:%d:gui_furnace_arrow_fg.png^[transformR270]"):format(_furnace_body_x + _slot_interval, margin + _slot_interval, item_percent),
+		("image[%.2f,%.2f;1,1;default_furnace_fire_bg.png^[lowpart:%d:default_furnace_fire_fg.png]"):format(
+			_furnace_body_x,
+			margin + _slot_interval,
+			fuel_percent
+		),
+		("image[%.2f,%.2f;1,1;gui_furnace_arrow_bg.png^[lowpart:%d:gui_furnace_arrow_fg.png^[transformR270]"):format(
+			_furnace_body_x + _slot_interval,
+			margin + _slot_interval,
+			item_percent
+		),
 	})
 end
 

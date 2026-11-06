@@ -45,7 +45,10 @@ local hotbar_x, hotbar_y = margin, margin + 4 + 3 * 0.25 + inv_separation
 
 local bones_formspec = table.concat({
 	"formspec_version[4]",
-	("size[%.2f,%.2f]"):format(margin + 8 + 7 * 0.25 + margin, margin + 4 + 3 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin),
+	("size[%.2f,%.2f]"):format(
+		margin + 8 + 7 * 0.25 + margin,
+		margin + 4 + 3 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin
+	),
 	("list[context;main;%.2f,%.2f;8,4;]"):format(margin, margin),
 	default.get_main_player_inventory_elements(hotbar_x, hotbar_y),
 	"listring[context;books]",

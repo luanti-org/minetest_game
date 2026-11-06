@@ -210,9 +210,13 @@ local _interval = slot_size + spacing
 local select_buttons_x = _interval * 2
 local select_buttons_y = 4
 local select_buttons_fs = table.concat({
-	("image_button[%.2f,%.2f;1,1;craftguide_prev_icon.png;recipe_prev;]"):format(select_buttons_x, select_buttons_y)..
-	("image_button[%.2f,%.2f;1,1;craftguide_next_icon.png;recipe_next;]"):format(select_buttons_x + _interval * 3, select_buttons_y)..
-	"tooltip[recipe_prev;"..esc(S("Previous recipe")).."]"..
+	("image_button[%.2f,%.2f;1,1;craftguide_prev_icon.png;recipe_prev;]"):format(
+		select_buttons_x, select_buttons_y
+	),
+	("image_button[%.2f,%.2f;1,1;craftguide_next_icon.png;recipe_next;]"):format(
+		select_buttons_x + _interval * 3, select_buttons_y
+	),
+	"tooltip[recipe_prev;"..esc(S("Previous recipe")).."]",
 	"tooltip[recipe_next;"..esc(S("Next recipe")).."]"
 })
 
@@ -234,9 +238,11 @@ local function recipe_fs(fs, data)
 		end
 	end
 
-	table.insert(fs, ("label[%.2f,%.2f;%s]"):format(select_buttons_x + _interval + 0.35, select_buttons_y + slot_size * 0.5, esc(data.show_usages
-		and S("Usage @1 of @2", data.rnum, #data.recipes)
-		or S("Recipe @1 of @2", data.rnum, #data.recipes))))
+	table.insert(fs, ("label[%.2f,%.2f;%s]"):format(
+		select_buttons_x + _interval + 0.35, select_buttons_y + slot_size * 0.5, esc(data.show_usages
+			and S("Usage @1 of @2", data.rnum, #data.recipes)
+			or S("Recipe @1 of @2", data.rnum, #data.recipes)))
+	)
 
 	if #data.recipes > 1 then
 		table.insert(fs, select_buttons_fs)
@@ -281,10 +287,18 @@ do
 	local _paginate_x = filter_width + spacing + (slot_size + spacing) * 2
 	base_formspec = table.concat({
 		"style_type[item_image_button;padding=2]",
-		("image_button[%.2f,%.2f;1,1;craftguide_prev_icon.png;prev;]"):format(_paginate_x, items_y_span),
-		("image_button[%.2f,%.2f;1,1;craftguide_next_icon.png;next;]"):format(_paginate_x + (slot_size + spacing) * 2, items_y_span),
-		("image_button[%.2f,%.2f;1,1;craftguide_search_icon.png;search;]"):format(filter_width + spacing, items_y_span),
-		("image_button[%.2f,%.2f;1,1;craftguide_clear_icon.png;clear;]"):format(filter_width + spacing + slot_size + spacing, items_y_span),
+		("image_button[%.2f,%.2f;1,1;craftguide_prev_icon.png;prev;]"):format(
+			_paginate_x, items_y_span
+		),
+		("image_button[%.2f,%.2f;1,1;craftguide_next_icon.png;next;]"):format(
+			_paginate_x + (slot_size + spacing) * 2, items_y_span
+		),
+		("image_button[%.2f,%.2f;1,1;craftguide_search_icon.png;search;]"):format(
+			filter_width + spacing, items_y_span
+		),
+		("image_button[%.2f,%.2f;1,1;craftguide_clear_icon.png;clear;]"):format(
+			filter_width + spacing + slot_size + spacing, items_y_span
+		),
 		("tooltip[search;%s]"):format(esc(S("Search"))),
 		("tooltip[clear;%s]"):format(esc(S("Reset"))),
 		("tooltip[prev;%s]"):format(esc(S("Previous page"))),

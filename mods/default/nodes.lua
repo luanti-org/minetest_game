@@ -2494,7 +2494,10 @@ local hotbar_x, hotbar_y = margin, margin + 2 + 1 * 0.25 + inv_separation
 
 local bookshelf_formspec = table.concat({
 	"formspec_version[4]",
-	("size[%.2f,%.2f]"):format(margin + 8 + 7 * 0.25 + margin, margin + 2 + 1 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin),
+	("size[%.2f,%.2f]"):format(
+		margin + 8 + 7 * 0.25 + margin,
+		margin + 2 + 1 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin
+	),
 	("list[context;books;%.2f,%.2f;8,4;]"):format(margin, margin),
 	default.get_main_player_inventory_elements(hotbar_x, hotbar_y),
 	"listring[context;books]",
