@@ -1,9 +1,4 @@
 player_api = {}
-
--- Player animation blending
--- Note: This is currently broken due to a bug in Irrlicht, leave at 0
-local animation_blend = 0
-
 player_api.registered_models = {}
 
 -- Local for speed.
@@ -34,6 +29,11 @@ function player_api.register_model(name, def)
 		animation.eye_height = animation.eye_height or def.eye_height
 		animation.collisionbox = animation.collisionbox or def.collisionbox
 		animation.override_local = animation.override_local or false
+		animation.tracks = animation.tracks or nil
+
+		-- Check if server is v5.17+, throw an error if not.
+		assert(not animation.tracks or core.features.hud_hideable_field,
+			"Multi-track animations are not supported, requires Luanti 5.17.0 or newer")
 
 		for _, other_animation in pairs(def.animations) do
 			if other_animation._equals then
@@ -116,16 +116,15 @@ function player_api.set_texture(player, index, texture)
 	player_api.set_textures(player, textures)
 end
 
-function player_api.set_animation(player, anim_name, speed, loop)
+function player_api.set_animation(player, anim_name, speed, loop, blend)
 	local player_data = get_player_data(player)
 	local model = models[player_data.model]
 	if not (model and model.animations[anim_name]) then
 		return
 	end
 	speed = speed or model.animation_speed
-	if loop == nil then
-		loop = true
-	end
+	blend = blend or 0
+	loop = loop or true
 	if player_data.animation == anim_name
 		and player_data.animation_speed == speed
 		and player_data.animation_loop == loop
@@ -133,14 +132,21 @@ function player_api.set_animation(player, anim_name, speed, loop)
 		return
 	end
 	local previous_anim = model.animations[player_data.animation] or {}
+	local previous_anim_name = player_data.animation
 	local anim = model.animations[anim_name]
+	local tracks = anim.tracks or false
 	player_data.animation = anim_name
 	player_data.animation_speed = speed
 	player_data.animation_loop = loop
+	player_data.animation_tracks = tracks
 	-- If necessary change the local animation (only seen by the client of *that* player)
 	-- `override_local` <=> suspend local animations while this one is active
 	-- (this is basically a hack, proper engine feature needed...)
-	if anim.override_local ~= previous_anim.override_local then
+	if tracks then
+		-- Can't set_local_animation with multi-track animations, engine limitation
+		anim.override_local = true
+	end
+	if (anim.override_local ~= previous_anim.override_local) then
 		if anim.override_local then
 			local none = {x=0, y=0}
 			player:set_local_animation(none, none, none, none, 1)
@@ -153,13 +159,47 @@ function player_api.set_animation(player, anim_name, speed, loop)
 		end
 	end
 	-- Set the animation seen by everyone else
-	player:set_animation(anim, speed, animation_blend, loop)
-	-- Update related properties if they changed
-	if anim._equals ~= previous_anim._equals then
-		player:set_properties({
-			collisionbox = anim.collisionbox,
-			eye_height = anim.eye_height
-		})
+	if tracks then
+		if previous_anim_name then
+			player_api.stop_animation(player, previous_anim_name)
+		end
+		for track_name, track in pairs(tracks) do
+			player:play_animation(track_name, {
+				min_frame = track.min_frame or 0,
+				max_frame = track.min_frame or math.huge,
+				start_frame = track.start or 0,
+				speed = track.speed or speed,
+				loop = track.loop or loop,
+				blend = track.blend or blend,
+				priority = track.priority or 0
+			})
+		end
+	else
+		player:set_animation(anim, speed, blend, loop)
+		-- Update related properties if they changed
+		if anim._equals ~= previous_anim._equals then
+			player:set_properties({
+				collisionbox = anim.collisionbox,
+				eye_height = anim.eye_height
+			})
+		end
+	end
+end
+
+function player_api.stop_animation(player, anim_name)
+	local player_data = get_player_data(player)
+	local model = models[player_data.model]
+	local anim = model.animations[anim_name]
+	player_data.animation = nil
+	player_data.animation_tracks = nil
+	if not (model and anim) then
+		return
+	end
+	local tracks = anim.tracks
+	if tracks then
+		for track_name in pairs(tracks) do
+			player:stop_animation(track_name)
+		end
 	end
 end
 

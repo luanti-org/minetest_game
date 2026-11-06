@@ -169,11 +169,11 @@ Doors API
 
 The doors mod allows modders to register custom doors and trapdoors.
 
-`doors.registered_doors[name] = Door definition` 
- * Table of registered doors, indexed by door name 
+`doors.registered_doors[name] = Door definition`
+ * Table of registered doors, indexed by door name
 
-`doors.registered_trapdoors[name] = Trapdoor definition` 
- * Table of registered trap doors, indexed by trap door name 
+`doors.registered_trapdoors[name] = Trapdoor definition`
+ * Table of registered trap doors, indexed by trap door name
 
 `doors.register_door(name, def)`
 
@@ -216,7 +216,7 @@ The doors mod allows modders to register custom doors and trapdoors.
  * `pos` Position of the door
  * `node` Node definition
  * `clicker` Player definition for the player that clicked on the door
- 
+
 ### Door definition
 
 	description = "Door description",
@@ -234,7 +234,7 @@ The doors mod allows modders to register custom doors and trapdoors.
 	gain_open = 0.3, -- optional, defaults to 0.3
 	gain_close = 0.3, -- optional, defaults to 0.3
 	protected = false, -- If true, only placer can open the door (locked for others)
-	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing), 
+	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing),
 	-- optional function containing the on_rightclick callback, defaults to a doors.door_toggle-wrapper
 	use_texture_alpha = "clip",
 
@@ -485,6 +485,13 @@ The player API can register player models and update the player's appearance.
 	* `player`: PlayerRef
 	* `anim_name`: name of the animation
 	* `speed`: keyframes per second. If nil, the default from the model def is used
+	* `loop`: boolean
+	* `blend`: float
+
+* `player_api.stop_animation(player, anim_name)
+	* Stops a running animation, requires Luanti v5.17+ and anim_name to be a multi-track animation.
+	* `player`: PlayerRef
+	* `anim_name`: name of the animation
 
 * `player_api.set_textures(player, textures)`
 	* Sets player textures
@@ -515,13 +522,29 @@ The player API can register player models and update the player's appearance.
 		animation_speed = 30,           -- Default animation speed, in keyframes per second
 		textures = {"character.png"},   -- Default array of textures
 		animations = {
-			-- [anim_name] = {
+			-- [anim_name] = {            -- For single-track animation models
 			--   x = <start_frame>,
 			--   y = <end_frame>,
 			--   collisionbox = <model collisionbox>, -- (optional)
 			--   eye_height = <model eye height>,     -- (optional)
 			--   -- suspend client side animations while this one is active (optional)
 			--   override_local = <true/false>
+			-- },
+			-- [anim_name] = {               -- For multi-track animation models
+			--   tracks = {                  -- If used then you must insure that server and client are v5.17 or newer
+			--     [track_name] = {          -- Name of the animation track in 3d modeling software
+			--       min_frame = 0,          -- (optional)
+			--       max_frame = math.huge,  -- (optional)
+			--       start = <start_frame>,  -- (optional)
+			--       speed = animation_speed -- (optional)
+			--       loop = <true/false>     -- (optional)
+			--       blend = 0               -- (optional)
+			--       priority = 0            -- (optional)
+			--     },
+			--     [track_name_2] = ..., [track_name_3] = ...
+			--   },
+			--   collisionbox = <model collisionbox>, -- (optional)
+			--   eye_height = <model eye height>,     -- (optional)
 			-- },
 			stand = ..., lay = ..., walk = ..., mine = ..., walk_mine = ..., -- required animations
 			sit = ... -- used by boats and other MTG mods
@@ -1096,7 +1119,7 @@ Trees
 	default.register_sapling_growth(
 		"default:sapling", -- Name of the sapling
 		{
-			can_grow = default.can_grow, -- Function called to determine whether the sapling can grow, should return a boolean 
+			can_grow = default.can_grow, -- Function called to determine whether the sapling can grow, should return a boolean
 			on_grow_failed = default.on_grow_failed, -- Function called when the growth fails
 			grow = function(pos) -- Function called when the growth has success. This should replace the sapling with a tree.
 		}
