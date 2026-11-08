@@ -945,6 +945,22 @@ GUI and formspecs
  * x: Horizontal position in the formspec
  * y: Vertical position in the formspec
 
+`default.get_inventory_icon_bg(x, y, width, height, texture, callback)`
+
+ * Get an inventory background as string, where each slot has a texture on it
+ * x: Horizontal position in the formspec
+ * y: Vertical position in the formspec
+ * width: Number of columns
+ * height: Number of rows
+ * texture: Texture used in the background
+ * callback: Callback called with slot index before each background element is added, omits the element if it returns `true` (optional)
+
+`default.get_main_player_inventory_elements(x, y)`
+
+ * Get the main player inventory as string, containing the formspec elements
+ * x: Horizontal position in the formspec
+ * y: Vertical position in the formspec
+
 `default.gui_bg`
 
  * Deprecated, remove from mods.
