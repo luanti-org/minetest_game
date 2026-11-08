@@ -48,7 +48,8 @@ local function formspec_write(title, text)
 			esc(S("Contents:")), esc(text)
 		) ..
 		("button_exit[%.2f,%.2f;%.2f,%.2f;save;%s]"):format(
-			(_form_width - button_major) * 0.5, margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding,
+			(_form_width - button_major) * 0.5,
+			margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding,
 			button_major, button_minor,
 			esc(S("Save"))
 		)
