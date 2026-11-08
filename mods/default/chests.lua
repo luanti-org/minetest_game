@@ -18,7 +18,10 @@ function default.chest.get_chest_formspec(pos)
 	local hotbar_x, hotbar_y = margin, margin + 4 + 3 * 0.25 + inv_separation
 	local formspec = table.concat({
 		"formspec_version[4]",
-		("size[%.2f,%.2f]"):format(margin + 8 + 7 * 0.25 + margin, margin + 4 + 3 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin),
+		("size[%.2f,%.2f]"):format(
+			margin + 8 + 7 * 0.25 + margin,
+			margin + 4 + 3 * 0.25 + inv_separation + 1 + hotbar_separation + 3 + 2 * 0.25 + margin
+		),
 		("list[%s;main;%.2f,%.2f;8,4;]"):format(invloc, margin, margin),
 		default.get_main_player_inventory_elements(hotbar_x, hotbar_y),
 		("listring[%s;main]"):format(invloc),

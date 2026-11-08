@@ -70,16 +70,19 @@ local function formspec_read(owner, title, string, text, page, page_max)
 			esc(string ~= "" and string or text)
 		) ..
 		("button[%.2f,%.2f;%.2f,%.2f;book_prev;<]"):format(
-			(_form_width - button_major) * 0.5 - button_minor, margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding,
+			(_form_width - button_major) * 0.5 - button_minor,
+			margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding,
 			button_minor, button_minor
 		) ..
 		("button[%.2f,%.2f;%.2f,%.2f;book_prev;>]"):format(
-			(_form_width + button_major) * 0.5, margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding,
+			(_form_width + button_major) * 0.5,
+			margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding,
 			button_minor, button_minor
 		) ..
 		("label[%.2f,%.2f;%s]"):format(
 			(_form_width - button_major) * 0.5 + page_label_offset,
-			margin + text_margin + title_bar_height + padding + text_margin + page_height + minor_padding + button_minor * 0.5,
+			margin + text_margin + title_bar_height + padding + text_margin + page_height +
+				minor_padding + button_minor * 0.5,
 			esc(S("Page @1 of @2", page, page_max))
 		)
 end
